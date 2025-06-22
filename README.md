@@ -1,4 +1,3 @@
-Awesome choice — **Pointaroo** is playful, brandable, and easy to remember. Here’s a clean and compelling `README.md` for your public GitHub repo:
 
 ---
 
@@ -88,6 +87,3 @@ Built with ❤️ to make good habits fun.
 ```
 
 ---
-
-Let me know if you want a **logo**, **Open Graph image**, or `vercel.json` config added too!
-```
