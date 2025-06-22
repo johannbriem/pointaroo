@@ -82,8 +82,3 @@ MIT License — free to use, share, and remix with credit.
 
 ---
 
-Built with ❤️ to make good habits fun.
-
-```
-
----
