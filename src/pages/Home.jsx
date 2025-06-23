@@ -12,6 +12,7 @@ export default function Home() {
   const [role, setRole] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [completionsToday, setCompletionsToday] = useState([]);
+  const [allCompletions, setAllCompletions] = useState([]);
   const [goal, setGoal] = useState(null);
   const [purchases, setPurchases] = useState([]);
   const [rewards, setRewards] = useState([]);
@@ -32,6 +33,7 @@ export default function Home() {
     if (user) {
         fetchTasks();
         fetchCompletionsToday();
+        fetchAllCompletions();
         fetchGoal();
         fetchPurchases();
         fetchRewards();
@@ -39,11 +41,12 @@ export default function Home() {
       // Clear data when user logs out
       setTasks([]);
       setCompletionsToday([]);
+      setAllCompletions([]);
       setGoal(null);
       setPurchases([]);
       setRewards([]);
     }
-  }, [user, loading]);
+  }, [user?.id, loading]);
 
   // Redirect admin users to the admin panel
   useEffect(() => {
@@ -65,6 +68,14 @@ export default function Home() {
       .gte("completed_at", startOfDay(new Date()).toISOString())
       .lte("completed_at", endOfDay(new Date()).toISOString());
     if (data) setCompletionsToday(data);
+  };
+
+  const fetchAllCompletions = async () => {
+    const { data } = await supabase
+      .from("task_completions")
+      .select("*")
+      .eq("user_id", user.id);
+    if (data) setAllCompletions(data);
   };
 
   const fetchGoal = async () => {
@@ -89,31 +100,17 @@ export default function Home() {
     if (data) setRewards(data);
   };
 
-  const handleComplete = async (task) => {
-    const countToday = completionsToday.filter((c) => c.task_id === task.id).length;
-
-    if (countToday >= task.max_per_day) {
-      alert("Limit reached for today.");
-      return;
-    }
-
-    const { error } = await supabase.from("task_completions").insert([
-      {
-        user_id: user.id,
-        task_id: task.id,
-      },
-    ]);
-    if (!error) {
-      fetchCompletionsToday();
-      alert(`Task "${task.title}" completed! You earned ${task.points} points.`);
-    } else {
-      console.error("Error saving task completion:", error.message);
-    }
+  const handleTaskSuccessfullyCompleted = async (task) => {
+    // This function is now a callback for after the modal successfully completes a task.
+    // It's responsible for refreshing the UI and showing feedback.
+    // The actual DB insert is handled in TaskModal.
+    await Promise.all([fetchCompletionsToday(), fetchAllCompletions()]);
+    alert(`Task "${task.title}" completed! You earned ${task.points} points.`);
   };
 
   const childGoal = goal ? goal.total_cost * (1 - goal.parent_percent / 100) : GOAL;
 
-  const earnedPoints = completionsToday.reduce((sum, comp) => {
+  const earnedPoints = allCompletions.reduce((sum, comp) => {
     const task = tasks.find((t) => t.id === comp.task_id);
     return task ? sum + task.points : sum;
   }, 0);
@@ -182,7 +179,7 @@ export default function Home() {
       <ProgressBar total={availablePoints} goal={childGoal} />
       <TaskList
         tasks={tasks}
-        onComplete={handleComplete}
+        onComplete={handleTaskSuccessfullyCompleted}
         completionsToday={completionsToday}
         userId={user.id}
       />
