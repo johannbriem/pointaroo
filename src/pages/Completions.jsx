@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 
 export default function Completions() {
+  const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [completions, setCompletions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,6 +11,7 @@ export default function Completions() {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        setUser(user);
         const { data: profile } = await supabase
           .from("profiles")
           .select("role")
@@ -24,29 +26,27 @@ export default function Completions() {
   }, []);
 
   useEffect(() => {
-    if (role === "admin") {
+    if (user) {
       fetchCompletions();
     }
-  }, [role]);
+  }, [user, role]);
 
   const fetchCompletions = async () => {
-    const { data, error } = await supabase
+    let query = supabase
       .from("task_completions")
       .select("*, tasks(title), profiles:user_id(display_name, email)")
       .order("completed_at", { ascending: false });
+
+    if (role !== "admin") {
+      query = query.eq("user_id", user.id);
+    }
+
+    const { data, error } = await query;
 
     if (!error) setCompletions(data);
   };
 
   if (loading) return <p className="text-center mt-10">Loading...</p>;
-
-  if (role !== "admin") {
-    return (
-      <div className="text-center mt-10 text-red-500 font-bold">
-        ❌ Access denied – Admins only
-      </div>
-    );
-  }
 
   const groupedCompletions = completions.reduce((acc, completion) => {
     const userId = completion.user_id;
@@ -64,51 +64,70 @@ export default function Completions() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6 text-center">📸 Task Completions</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        📸 {role === "admin" ? "Task Completions" : "My Completions"}
+      </h1>
       {completions.length === 0 ? (
         <p className="text-center text-gray-500 mt-10">No task completions yet.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {userGroups.map(({ user, completions: userCompletions }) => (
-            <div key={user.email} className="bg-gray-50 p-4 rounded-lg shadow-inner">
-              <h2 className="text-xl font-bold mb-4 border-b pb-2 text-gray-700 text-center">
-                {user.display_name || user.email}
-              </h2>
-              <div className="space-y-4">
-                {userCompletions.map((item) => (
-                  <div key={item.id} className="border p-4 rounded-lg shadow-sm bg-white">
-                    <h3 className="font-semibold text-lg text-black mb-2">{item.tasks?.title || 'Untitled Task'}</h3>
-                    <p className="text-sm text-gray-500 mb-2">
-                      {new Date(item.completed_at).toLocaleString()}
-                    </p>
-                    <div className="flex space-x-4">
-                      {item.before_photo && (
-                        <div>
-                          <p className="text-xs font-semibold text-gray-600">Before:</p>
-                          <img
-                            src={item.before_photo}
-                            alt="Before"
-                            className="w-32 h-32 object-cover border rounded"
-                          />
-                        </div>
-                      )}
-                      {item.after_photo && (
-                        <div>
-                          <p className="text-xs font-semibold text-gray-600">After:</p>
-                          <img
-                            src={item.after_photo}
-                            alt="After"
-                            className="w-32 h-32 object-cover border rounded"
-                          />
-                        </div>
-                      )}
+        role === "admin" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {userGroups.map(({ user, completions: userCompletions }) => (
+              <div key={user.email} className="bg-gray-50 p-4 rounded-lg shadow-inner">
+                <h2 className="text-xl font-bold mb-4 border-b pb-2 text-gray-700 text-center">
+                  {user.display_name || user.email}
+                </h2>
+                <div className="space-y-4">
+                  {userCompletions.map((item) => (
+                    <div key={item.id} className="border p-4 rounded-lg shadow-sm bg-white">
+                      <h3 className="font-semibold text-lg text-black mb-2">{item.tasks?.title || 'Untitled Task'}</h3>
+                      <p className="text-sm text-gray-500 mb-2">
+                        {new Date(item.completed_at).toLocaleString()}
+                      </p>
+                      <div className="flex space-x-4">
+                        {item.before_photo && (
+                          <div>
+                            <p className="text-xs font-semibold text-gray-600">Before:</p>
+                            <img src={item.before_photo} alt="Before" className="w-32 h-32 object-cover border rounded" />
+                          </div>
+                        )}
+                        {item.after_photo && (
+                          <div>
+                            <p className="text-xs font-semibold text-gray-600">After:</p>
+                            <img src={item.after_photo} alt="After" className="w-32 h-32 object-cover border rounded" />
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {completions.map((item) => (
+              <div key={item.id} className="border p-4 rounded-lg shadow-sm bg-white">
+                <h3 className="font-semibold text-lg text-black mb-2">{item.tasks?.title || 'Untitled Task'}</h3>
+                <p className="text-sm text-gray-500 mb-2">{new Date(item.completed_at).toLocaleString()}</p>
+                <div className="flex space-x-4">
+                  {item.before_photo && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">Before:</p>
+                      <img src={item.before_photo} alt="Before" className="w-32 h-32 object-cover border rounded" />
+                    </div>
+                  )}
+                  {item.after_photo && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">After:</p>
+                      <img src={item.after_photo} alt="After" className="w-32 h-32 object-cover border rounded" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )
       )}
     </div>
   );
