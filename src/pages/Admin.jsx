@@ -3,10 +3,10 @@ import { supabase } from "../supabaseClient";
 import KidPreview from "../components/KidPreview";
 import KidsOverview from "../components/KidsOverview";
 import BonusPointsForm from "../components/BonusModal";
-import { useOutletContext } from "react-router-dom"; // Import useOutletContext
 
 export default function Admin() {
-  const { user, loading, role, fetchAllData } = useOutletContext(); // Get user, loading, role from context
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [form, setForm] = useState({
     title: "",
@@ -33,13 +33,32 @@ export default function Admin() {
     requires_approval: false,
   });
 
-  useEffect(() => { // Initial data fetch for Admin specific data
-    if (user && !loading) {
+  useEffect(() => {
+    const loadUserAndRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+        setRole(profile?.role || null);
+      }
+    };
+    loadUserAndRole();
+  }, []);
+
+  // This useEffect now handles fetching all admin-related data,
+  // and it only runs when we have a user and their role is confirmed to be 'admin'.
+  useEffect(() => {
+    if (user && role === 'admin') {
       fetchKids();
+      fetchTasks();
       fetchRewards();
       fetchRewardRequests();
     }
-  }, [user, loading]); // Depend on user and loading from context
+  }, [user, role]);
 
   const fetchKids = async () => {
     const { data: profiles } = await supabase
@@ -89,14 +108,20 @@ export default function Admin() {
   const fetchRewardRequests = async () => {
     const { data, error } = await supabase
       .from("reward_requests")
-      .select("*, profiles(display_name, email), rewards(name, cost, photo_url)");
-    if (!error) setRewardRequests(data);
-    else console.error("Error fetching reward requests:", error);
+      .select(`
+        *,
+        user:profiles!user_id(display_name, email),
+        admin:profiles!admin_id(display_name, email),
+        rewards(name, cost, photo_url)
+      `);
+    if (error) {
+      console.error("Error fetching reward requests:", error);
+      setRewardRequests([]); // Clear requests on error
+      alert("Failed to load reward requests. Check console for details."); // Inform admin
+    } else {
+      setRewardRequests(data);
+    }
   };
-
-  useEffect(() => {
-    if (role === "admin") fetchTasks();
-  }, [role]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -195,11 +220,6 @@ export default function Admin() {
     }
   };
 
-  // Fetch reward requests for admin view
-  useEffect(() => {
-    if (role === "admin") fetchRewardRequests();
-  }, [role]);
-
   const handleApproveRequest = async (request) => {
     // 1. Update request status to 'approved'
     const { error: updateError } = await supabase
@@ -229,7 +249,7 @@ export default function Admin() {
     }
 
     alert("Request approved and purchase recorded!");
-    fetchAllData(); // Refresh all data from root context
+    fetchRewardRequests(); // Refresh the list
   };
 
   const handleRejectRequest = async (request) => {
@@ -251,7 +271,7 @@ export default function Admin() {
     if (bonusError) console.error("Error refunding points:", bonusError);
 
     alert("Request rejected!");
-    fetchAllData(); // Refresh all data from root context
+    fetchRewardRequests(); // Refresh the list
   };
 
   const groupedTasks = tasks.reduce((acc, task) => {
@@ -272,7 +292,7 @@ export default function Admin() {
     return indexA - indexB;
   });
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (!user) return <p className="text-center mt-10">Loading...</p>;
   if (role !== "admin") return <p className="text-red-500 text-center mt-10">❌ Admin access only</p>;
 
   return (
@@ -472,40 +492,57 @@ export default function Admin() {
 
         {activeTab === "requests" && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-2">✉️ Reward Requests</h2>
-            <div className="space-y-4">
-              {rewardRequests.length === 0 && (
-                <p className="text-gray-500">No reward requests found.</p>
-              )}
-              {rewardRequests.map((request) => (
-                <div key={request.id} className="bg-white border p-4 rounded shadow flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p>
-                      <span className="font-bold">{request.profiles?.display_name || request.profiles?.email}</span> requested <span className="font-bold">{request.rewards?.name}</span>
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Cost: {request.rewards?.cost} pts | Status: <span className={`font-bold ${request.status === "pending" ? "text-yellow-600" : request.status === "approved" ? "text-green-600" : "text-red-600"}`}>{request.status}</span>
-                    </p>
-                  </div>
-                  {request.status === "pending" && (
-                    <div className="flex gap-2 mt-2 md:mt-0">
+            <h2 className="text-xl font-semibold mb-4">✉️ Pending Reward Requests</h2>
+            {rewardRequests.filter(r => r.status === 'pending').length === 0 ? (
+              <p className="text-gray-500">No pending requests.</p>
+            ) : (
+              <div className="space-y-4">
+                {rewardRequests.filter(r => r.status === 'pending').map((request) => (
+                  <div key={request.id} className="bg-white p-4 rounded-lg shadow-sm border">
+                    <div className="flex items-center mb-2">
+                      {request.rewards?.photo_url && (
+                        <img
+                          src={request.rewards.photo_url}
+                          alt={request.rewards.name}
+                          className="w-16 h-16 object-cover rounded mr-4"
+                        />
+                      )}
+                      <div>
+                        <p className="font-bold text-lg">{request.rewards?.name || 'Unknown Reward'}</p>
+                        <p className="text-sm text-gray-600">
+                          Requested by: {request.user?.display_name || request.profiles?.email || 'Unknown User'}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Cost: {request.points_deducted} pts
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          On: {new Date(request.requested_at).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 mt-3">
                       <button
                         onClick={() => handleApproveRequest(request)}
-                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                        className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded font-semibold"
                       >
                         Approve
                       </button>
                       <button
                         onClick={() => handleRejectRequest(request)}
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                        className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded font-semibold"
                       >
                         Reject
                       </button>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <h3 className="text-lg font-semibold mt-8 mb-2">All Reward Requests (History)</h3>
+            {/* You can add a section here to view approved/rejected requests if needed */}
+            <p className="text-sm text-gray-500">
+              Total requests: {rewardRequests.length} (Approved: {rewardRequests.filter(r => r.status === 'approved').length}, Rejected: {rewardRequests.filter(r => r.status === 'rejected').length})
+            </p>
           </div>
         )}
 

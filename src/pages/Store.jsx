@@ -3,15 +3,13 @@ import { supabase } from "../supabaseClient";
 import { useOutletContext } from "react-router-dom";
 
 export default function Store() {
-  const {
-    user,
-    availablePoints,
-    purchases = [],
-    rewardRequests = [],
-    fetchAllData,
-  } = useOutletContext();
+  const { user, loading } = useOutletContext(); // Only get user and loading from App.jsx
 
-  const [rewards, setRewards] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [allCompletions, setAllCompletions] = useState([]);
+  const [purchases, setPurchases] = useState([]);
+  const [rewardRequests, setRewardRequests] = useState([]);
+  const [rewards, setRewards] = useState([]); // Already there
 
   useEffect(() => {
     const fetchRewards = async () => {
@@ -21,7 +19,43 @@ export default function Store() {
     fetchRewards();
   }, []);
 
+  // --- Re-introducing data fetching and point calculation to Store.jsx ---
+  useEffect(() => {
+    if (user && !loading) {
+      fetchTasks();
+      fetchAllCompletions();
+      fetchPurchases();
+      fetchRewardRequests(); 
+    }
+  }, [user?.id, loading]);
+
+  const fetchTasks = async () => {
+    const { data } = await supabase.from("tasks").select("*");
+    if (data) setTasks(data);
+  };
+
+  const fetchAllCompletions = async () => {
+    const { data } = await supabase.from("task_completions").select("*").eq("user_id", user.id);
+    if (data) setAllCompletions(data);
+  };
+
+  const fetchPurchases = async () => {
+    const { data } = await supabase.from("purchases").select("*").eq("user_id", user.id);
+    if (data) setPurchases(data);
+  };
+
+  const fetchRewardRequests = async () => {
+    const { data } = await supabase.from("reward_requests").select("*, rewards(name, cost)").eq("user_id", user.id);
+    if (data) setRewardRequests(data);
+  };
+
+  const earnedPoints = allCompletions.reduce((sum, comp) => sum + (parseInt(tasks.find(t => t.id === comp.task_id)?.points) || 0), 0);
+  const purchasedPoints = purchases.reduce((sum, p) => sum + (parseInt(p.cost) || 0), 0);
+  const pendingRequestedPoints = rewardRequests.reduce((sum, req) => sum + (req.status === 'pending' ? (parseInt(req.points_deducted) || 0) : 0), 0);
+  const spentPoints = purchasedPoints + pendingRequestedPoints;
+  const availablePoints = earnedPoints - spentPoints;
   const balance = availablePoints;
+  // --- End re-introduction ---
 
   // Check if a reward has been purchased by the user
   const isPurchased = (rewardId) => {
@@ -50,7 +84,7 @@ export default function Store() {
       ]);
       if (!requestError) {
         alert(`🎉 Request for "${reward.name}" submitted! ${reward.cost} points deducted.`);
-        fetchAllData(); // Refresh all data from the root
+        await Promise.all([fetchPurchases(), fetchRewardRequests()]); // Refresh local data
       } else {
         console.error("Error submitting request:", requestError);
         alert("Failed to submit request.");
@@ -65,7 +99,7 @@ export default function Store() {
       ]);
       if (!error) {
         alert(`🎉 You bought: ${reward.name}!`);
-        fetchAllData(); // Refresh all data from the root
+        await fetchPurchases(); // Refresh local data
       } else {
         console.error("Error making purchase:", error);
         alert("Purchase failed.");
@@ -84,8 +118,8 @@ export default function Store() {
           const purchased = isPurchased(reward.id);
           const pendingRequest = isPendingRequest(reward.id);
           return (
-            <div key={reward.id} className={`rounded border shadow-sm flex flex-col ${
-              purchased ? "bg-green-50" : pendingRequest ? "bg-yellow-50" : afford ? "bg-white" : "bg-gray-100 text-gray-400"
+            <div key={reward.id} className={`rounded border shadow-sm flex flex-col ${ // Added explicit text colors for readability
+              purchased ? "bg-green-50 text-gray-900" : pendingRequest ? "bg-yellow-50 text-gray-900" : afford ? "bg-white text-gray-900" : "bg-gray-100 text-gray-400"
             }`}>
               {reward.photo_url && (
                 <img
