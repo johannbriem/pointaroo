@@ -1,37 +1,19 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
+import { useOutletContext } from "react-router-dom"; // Import useOutletContext
 
 export default function Completions() {
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null);
+  const { user, loading, role } = useOutletContext(); // Get user, loading, role from context
   const [completions, setCompletions] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .single();
-
-        setRole(profile?.role);
-      }
-      setLoading(false);
-    };
-    load();
-  }, []);
-
-  useEffect(() => {
-    if (user) {
+    if (user && !loading) { // Only fetch if user is loaded
       fetchCompletions();
     }
-  }, [user, role]);
+  }, [user, role, loading]); // Depend on user, role, and loading from context
 
   const fetchCompletions = async () => {
+    setLoading(true);
     let query = supabase
       .from("task_completions")
       .select("*, tasks(title), profiles:user_id(display_name, email)")
@@ -44,6 +26,7 @@ export default function Completions() {
     const { data, error } = await query;
 
     if (!error) setCompletions(data);
+    setLoading(false);
   };
 
   if (loading) return <p className="text-center mt-10">Loading...</p>;
