@@ -28,7 +28,7 @@
     "createReward": "Búa til verðlaun"
   },
   "app": {
-    "title": "Aflaðu þér símans!",
+    "title": "Pointaroo",
     "loginPrompt": "Skráðu þig inn til að sjá verkefnin þín og safna stigum fyrir markmiðið þitt.",
     "login": "Innskráning",
     "signup": "Nýskráning",
@@ -92,7 +92,7 @@
     "currentRewards": "Núverandi verðlaun",
     "pendingRewardRequests": "Verðlaunabeiðnir í bið",
     "allRewardRequests": "Allar verðlaunabeiðnir (ferill)",
-    "previewAsKid": "Forskoða sem barn",
+    "previewAsKid": "Skoða sem barn",
     "editKidGoals": "Breyta markmiðum barna",
     "phoneModel": "Símaheiti",
     "totalCost": "Heildarkostnaður",
@@ -128,7 +128,7 @@
   "navbar": {
     "store": "Búð",
     "completions": "Lokanir",
-    "admin": "Stjórnandi",
+    "admin": "Stjórnborð",
     "myGoal": "Markmið mitt",
     "installApp": "Setja upp forrit",
     "logout": "Útskrá"
