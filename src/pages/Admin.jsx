@@ -31,7 +31,10 @@ export default function Admin() {
     cost: 0,
     photo_url: "",
     requires_approval: false,
+    request_cooldown_days: 0, // New field for cooldown
   });
+  const [isEditingReward, setIsEditingReward] = useState(false);
+  const [editingRewardId, setEditingRewardId] = useState(null);
   const [historyFilter, setHistoryFilter] = useState('all');
 
   useEffect(() => {
@@ -163,25 +166,53 @@ export default function Admin() {
 
   const handleAddRewardSubmit = async (e) => {
     e.preventDefault();
-    const { error } = await supabase.from("rewards").insert([newRewardForm]);
+    let error;
+
+    if (isEditingReward) {
+      ({ error } = await supabase
+        .from("rewards")
+        .update(newRewardForm)
+        .eq("id", editingRewardId));
+    } else {
+      ({ error } = await supabase.from("rewards").insert([newRewardForm]));
+    }
 
     if (!error) {
-      alert("Reward added successfully!");
-      setNewRewardForm({
-        name: "",
-        description: "",
-        cost: 0,
-        photo_url: "",
-        requires_approval: false,
-      });
-      setShowAddRewardForm(false);
-      // Refresh rewards list
-      const { data } = await supabase.from("rewards").select("*").order("cost");
-      if (data) setRewards(data);
+      alert(isEditingReward ? "Reward updated successfully!" : "Reward added successfully!");
+      resetRewardForm();
+      fetchRewards();
     } else {
-      console.error("Error adding reward:", error);
-      alert("Failed to add reward.");
+      console.error(isEditingReward ? "Error updating reward:" : "Error adding reward:", error);
+      alert(isEditingReward ? "Failed to update reward." : "Failed to add reward.");
     }
+  };
+
+  const resetRewardForm = () => {
+    setNewRewardForm({
+      name: "",
+      description: "",
+      cost: 0,
+      photo_url: "",
+      requires_approval: false,
+      request_cooldown_days: 0,
+    });
+    setShowAddRewardForm(false);
+    setIsEditingReward(false);
+    setEditingRewardId(null);
+  };
+
+  const startEditReward = (reward) => {
+    setIsEditingReward(true);
+    setEditingRewardId(reward.id);
+    setNewRewardForm({
+      name: reward.name,
+      description: reward.description,
+      cost: reward.cost,
+      photo_url: reward.photo_url || "",
+      requires_approval: reward.requires_approval,
+      request_cooldown_days: reward.request_cooldown_days || 0,
+    });
+    setShowAddRewardForm(true); // Make sure form is visible
   };
 
   const resetForm = () => {
@@ -424,7 +455,9 @@ export default function Admin() {
               </button>
               {showAddRewardForm && (
                 <form onSubmit={handleAddRewardSubmit} className="bg-white p-4 rounded shadow space-y-3">
-                  <h2 className="text-lg font-semibold text-gray-800">Add New Reward</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {isEditingReward ? "✏️ Edit Reward" : "➕ Add New Reward"}
+                  </h2>
                   <input
                     type="text"
                     name="name"
@@ -468,23 +501,43 @@ export default function Admin() {
                     />
                     <span>Requires Admin Approval</span>
                   </label>
-                  <button
-                    type="submit"
-                    className="w-full py-2 rounded-md font-bold text-white bg-black hover:bg-gray-800"
-                  >
-                    Create Reward
-                  </button>
+                  <label className="flex items-center space-x-2 text-black">
+                    <input
+                      type="number"
+                      name="request_cooldown_days"
+                      placeholder="Cooldown (days)"
+                      value={newRewardForm.request_cooldown_days}
+                      onChange={handleAddRewardChange}
+                      className="w-full p-2 border border-gray-300 rounded-md text-black"
+                    />
+                    <span>Request Cooldown (days)</span>
+                  </label>
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="submit"
+                      className="flex-1 py-2 rounded-md font-bold text-white bg-black hover:bg-gray-800"
+                    >
+                      {isEditingReward ? "💾 Save Changes" : "Create Reward"}
+                    </button>
+                    {isEditingReward && (
+                      <button type="button" onClick={resetRewardForm} className="flex-1 py-2 rounded-md font-bold text-white bg-gray-500 hover:bg-gray-600">Cancel</button>
+                    )}
+                  </div>
                 </form>
               )}
             </div>
             <h3 className="text-lg font-semibold mb-2">Current Rewards</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {rewards.map((reward) => (
-                <div key={reward.id} className="p-4 rounded border shadow-sm bg-white">
-                  <h2 className="text-lg font-semibold">{reward.name}</h2>
-                  <p className="text-sm">{reward.description}</p>
-                  <p className="mt-2 font-bold">{reward.cost} pts</p>
-                  {reward.requires_approval && <p className="text-xs text-blue-600 font-semibold">Requires Approval</p>}
+                <div key={reward.id} className="p-4 rounded border shadow-sm bg-white flex justify-between items-start">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-600">{reward.name}</h2>
+                    <p className="text-sm text-gray-600">{reward.description}</p>
+                    <p className="mt-2 font-bold text-gray-600">{reward.cost} pts</p>
+                    {reward.request_cooldown_days > 0 && <p className="text-xs text-purple-600 font-semibold">Cooldown: {reward.request_cooldown_days} days</p>}
+                    {reward.requires_approval && <p className="text-xs text-blue-600 font-semibold">Requires Approval</p>}
+                  </div>
+                  <button onClick={() => startEditReward(reward)} className="text-blue-600 font-medium hover:underline text-xl ml-2">✏️</button>
                 </div>
               ))}
             </div>
@@ -557,16 +610,16 @@ export default function Admin() {
                         <img src={request.rewards.photo_url} alt={request.rewards.name} className="w-12 h-12 object-cover rounded mr-4" />
                       )}
                       <div>
-                        <p className="font-bold text-lg">{request.rewards?.name || 'Unknown Reward'}</p>
-                        <p className="text-sm text-gray-600">Requested by: {request.user?.display_name || request.user?.email || 'Unknown User'}</p>
+                        <p className="font-bold text-lg text-blue-600">{request.rewards?.name || 'Unknown Reward'}</p>
+                        <p className="text-sm text-gray-600">Requested by: {request.user?.display_name || request.user?.email || 'Unknown'}</p>
                         <p className="text-sm text-gray-600">Cost: {request.points_deducted} pts</p>
                         <p className="text-sm text-gray-600">
                           Status: <span className={`font-semibold ${request.status === 'pending' ? 'text-yellow-600' : request.status === 'approved' ? 'text-green-600' : 'text-red-600'}`}>{request.status.charAt(0).toUpperCase() + request.status.slice(1)}</span>
                         </p>
-                        <p className="text-xs text-gray-500">Requested: {new Date(request.requested_at).toLocaleString()}</p>
+                <p className="text-xs text-gray-500">Requested: {new Date(request.requested_at).toLocaleDateString()}</p>
                         {request.approved_at && (
                           <p className="text-xs text-gray-500">
-                            Processed: {new Date(request.approved_at).toLocaleString()} by {request.admin?.display_name || request.admin?.email || 'Unknown Admin'}
+                            Processed: {new Date(request.approved_at).toLocaleString()} by {request.admin?.display_name || request.admin?.email || 'Unknown'}
                           </p>
                         )}
                       </div>

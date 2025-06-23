@@ -5,6 +5,7 @@ import { useOutletContext } from "react-router-dom"; // Import useOutletContext
 export default function Completions() {
   const { user, loading, role } = useOutletContext(); // Get user, loading, role from context
   const [completions, setCompletions] = useState([]);
+  const [localLoading, setLoading] = useState(false); // Local loading state for fetchCompletions
 
   useEffect(() => {
     if (user && !loading) { // Only fetch if user is loaded
@@ -28,7 +29,7 @@ export default function Completions() {
     if (!error) setCompletions(data);
     setLoading(false);
   };
-
+  if (loading || localLoading) return <p className="text-center mt-10">Loading...</p>;
   if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   const groupedCompletions = completions.reduce((acc, completion) => {
