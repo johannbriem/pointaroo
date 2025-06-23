@@ -50,7 +50,7 @@ export default function TaskModal({ task, userId, onClose, onCompleted }) {
             <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => setBeforeFile(e.target.files[0])}
+                onChange={(e) => e.target.files[0] && setBeforeFile(e.target.files[0])}
                 className="block w-full"
             />
             </div>
@@ -62,7 +62,7 @@ export default function TaskModal({ task, userId, onClose, onCompleted }) {
             <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => setAfterFile(e.target.files[0])}
+                onChange={(e) => e.target.files[0] && setAfterFile(e.target.files[0])}
                 className="block w-full"
             />
             </div>

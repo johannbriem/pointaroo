@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import KidPreview from "../components/KidPreview";
+import TaskManager from "../components/TaskManager";
+import KidsOverview from "../components/KidsOverview";
+import BonusPointsForm from "../components/BonusModal";
 
 export default function Admin() {
   const [user, setUser] = useState(null);
@@ -15,7 +18,7 @@ export default function Admin() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
-
+  const [activeTab, setActiveTab] = useState("tasks");
   const [bonus, setBonus] = useState({ user_id: "", points: 0, reason: "" });
   const [kids, setKids] = useState([]);
   const [showBonusModal, setShowBonusModal] = useState(false);
@@ -43,12 +46,38 @@ export default function Admin() {
   }, []);
 
   const fetchKids = async () => {
-    const { data } = await supabase
+    const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, email")
+      .select("id, email, display_name")
       .eq("role", "kid");
 
-    if (data) setKids(data);
+    if (!profiles) return;
+
+    const userIds = profiles.map((p) => p.id);
+    const { data: goalsData } = await supabase
+      .from("goals")
+      .select("*")
+      .in("user_id", userIds);
+
+    const merged = profiles.map((p) => ({
+      ...p,
+      goal: goalsData.find((g) => g.user_id === p.id) || {},
+    }));
+
+    setKids(merged);
+  };
+
+  const updateGoal = async (kidId, updatedGoal) => {
+    const { error } = await supabase
+      .from("goals")
+      .upsert({ ...updatedGoal, user_id: kidId });
+
+    if (error) {
+      alert("Error updating goal.");
+    } else {
+      alert("Goal updated!");
+      fetchKids(); // refresh to reflect changes
+    }
   };
 
   const fetchTasks = async () => {
@@ -133,7 +162,34 @@ export default function Admin() {
     <>
       <div className="max-w-4xl mx-auto p-6">
         <h1 className="text-2xl font-bold mb-4">🔧 Admin – Task Manager</h1>
+        <div className="flex gap-4 mb-4">
+          <button onClick={() => setActiveTab("tasks")}>🧱 Tasks</button>
+          <button onClick={() => setActiveTab("kids")}>👨‍👧 Kids</button>
+          <button onClick={() => setActiveTab("bonus")}>🎁 Bonus</button>
+        </div>
 
+        {activeTab === "tasks" && (
+          <TaskManager
+            form={form}
+            tasks={tasks}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            startEdit={startEdit}
+            isEditing={isEditing}
+          />
+        )}
+        {activeTab === "kids" && <KidsOverview kids={kids} />}
+        {activeTab === "bonus" && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-2">🎁 Give Bonus Points</h2>
+            <button
+              onClick={() => setShowBonusModal(true)}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
+            >
+              Give Bonus Points
+            </button>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow space-y-4 mb-8">
           <h2 className="text-lg font-semibold text-gray-800">
             {isEditing ? "✏️ Edit Task" : "➕ Add New Task"}
@@ -216,18 +272,85 @@ export default function Admin() {
           ))}
         </ul>
 
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-2">🎁 Give Bonus Points</h2>
-          <button
-            onClick={() => setShowBonusModal(true)}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
-          >
-            Give Bonus Points
-          </button>
-        </div>
 
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-2">👀 Preview As Kid</h2>
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-2">🎯 Edit Kid Goals</h2>
+            {kids.map((kid) => (
+              <div key={kid.id} className="bg-white border p-4 rounded shadow mb-4">
+                <h3 className="font-bold mb-2">{kid.display_name || kid.email}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Phone Model"
+                    className="border p-2 rounded"
+                    value={kid.goal?.phone_model || ""}
+                    onChange={(e) =>
+                      setKids((prev) =>
+                        prev.map((k) =>
+                          k.id === kid.id
+                            ? { ...k, goal: { ...k.goal, phone_model: e.target.value } }
+                            : k
+                        )
+                      )
+                    }
+                  />
+                  <input
+                    type="number"
+                    placeholder="Total Cost"
+                    className="border p-2 rounded"
+                    value={kid.goal?.total_cost || ""}
+                    onChange={(e) =>
+                      setKids((prev) =>
+                        prev.map((k) =>
+                          k.id === kid.id
+                            ? { ...k, goal: { ...k.goal, total_cost: e.target.value } }
+                            : k
+                        )
+                      )
+                    }
+                  />
+                  <input
+                    type="number"
+                    placeholder="Parent %"
+                    className="border p-2 rounded"
+                    value={kid.goal?.parent_percent || ""}
+                    onChange={(e) =>
+                      setKids((prev) =>
+                        prev.map((k) =>
+                          k.id === kid.id
+                            ? { ...k, goal: { ...k.goal, parent_percent: e.target.value } }
+                            : k
+                        )
+                      )
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Image URL"
+                    className="border p-2 rounded"
+                    value={kid.goal?.phone_image || ""}
+                    onChange={(e) =>
+                      setKids((prev) =>
+                        prev.map((k) =>
+                          k.id === kid.id
+                            ? { ...k, goal: { ...k.goal, phone_image: e.target.value } }
+                            : k
+                        )
+                      )
+                    }
+                  />
+                </div>
+                <button
+                  onClick={() => updateGoal(kid.id, kid.goal)}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  💾 Save Goal
+                </button>
+              </div>
+            ))}
+          </div>
           <select
             value={viewingKidId}
             onChange={(e) => setViewingKidId(e.target.value)}
@@ -245,56 +368,15 @@ export default function Admin() {
         {viewingKidId && <KidPreview userId={viewingKidId} />}
       </div>
 
-      {showBonusModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md space-y-4 text-black">
-            <h2 className="text-xl font-bold">🎁 Give Bonus Points</h2>
-
-            <select
-              value={bonus.user_id}
-              onChange={(e) => setBonus({ ...bonus, user_id: e.target.value })}
-              className="w-full p-2 border border-gray-300 rounded"
-            >
-              <option value="">Select kid</option>
-              {kids.map((k) => (
-                <option key={k.id} value={k.id}>
-                  {k.email}
-                </option>
-              ))}
-            </select>
-
-            <input
-              type="number"
-              placeholder="Points"
-              value={bonus.points}
-              onChange={(e) => setBonus({ ...bonus, points: parseInt(e.target.value) })}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-            <input
-              type="text"
-              placeholder="Reason (e.g. Helped grandma)"
-              value={bonus.reason}
-              onChange={(e) => setBonus({ ...bonus, reason: e.target.value })}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowBonusModal(false)}
-                className="text-gray-600 hover:underline"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleBonusSubmit}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Give Points
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        {showBonusModal && (
+          <BonusModal
+            bonus={bonus}
+            kids={kids}
+            setBonus={setBonus}
+            onClose={() => setShowBonusModal(false)}
+            onSubmit={handleBonusSubmit}
+          />
+        )}
     </>
   );
 }
