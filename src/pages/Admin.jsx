@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import KidPreview from "../components/KidPreview";
-import TaskManager from "../components/TaskManager";
 import KidsOverview from "../components/KidsOverview";
 import BonusPointsForm from "../components/BonusModal";
 
@@ -155,6 +154,24 @@ export default function Admin() {
     }
   };
 
+  const groupedTasks = tasks.reduce((acc, task) => {
+    const key = task.frequency || 'other';
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(task);
+    return acc;
+  }, {});
+
+  const frequencyOrder = ['daily', 'weekly', 'once', 'other'];
+  const sortedFrequencies = Object.keys(groupedTasks).sort((a, b) => {
+    const indexA = frequencyOrder.indexOf(a);
+    const indexB = frequencyOrder.indexOf(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
   if (!user) return <p className="text-center mt-10">Loading...</p>;
   if (role !== "admin") return <p className="text-red-500 text-center mt-10">❌ Admin access only</p>;
 
@@ -169,14 +186,96 @@ export default function Admin() {
         </div>
 
         {activeTab === "tasks" && (
-          <TaskManager
-            form={form}
-            tasks={tasks}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            startEdit={startEdit}
-            isEditing={isEditing}
-          />
+          <>
+            <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow space-y-4 mb-8">
+              <h2 className="text-lg font-semibold text-gray-800">
+                {isEditing ? "✏️ Edit Task" : "➕ Add New Task"}
+              </h2>
+
+              <input
+                type="text"
+                name="title"
+                placeholder="Task title"
+                value={form.title}
+                onChange={handleChange}
+                required
+                className="w-full p-3 border border-gray-300 rounded-md text-black"
+              />
+              <input
+                type="number"
+                name="points"
+                value={form.points}
+                onChange={handleChange}
+                placeholder="Points"
+                className="w-full p-3 border border-gray-300 rounded-md text-black"
+              />
+              <input
+                type="number"
+                name="max_per_day"
+                value={form.max_per_day}
+                onChange={handleChange}
+                placeholder="Max per day"
+                className="w-full p-3 border border-gray-300 rounded-md text-black"
+              />
+              <select
+                name="frequency"
+                value={form.frequency}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-md text-black"
+              >
+                <option value="once">Once</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+              </select>
+              <input
+                type="text"
+                name="photo_url"
+                value={form.photo_url}
+                onChange={handleChange}
+                placeholder="Image URL (optional)"
+                className="w-full p-3 border border-gray-300 rounded-md text-black"
+              />
+
+              <button
+                type="submit"
+                className={`w-full py-3 rounded-md font-bold text-white ${
+                  isEditing ? "bg-yellow-500 hover:bg-yellow-600" : "bg-black hover:bg-gray-800"
+                }`}
+              >
+                {isEditing ? "💾 Save Changes" : "➕ Add Task"}
+              </button>
+            </form>
+
+            <h2 className="text-xl font-semibold mb-2">Current Tasks</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {sortedFrequencies.map((frequency) => (
+                <div key={frequency}>
+                  <h3 className="text-lg font-semibold capitalize mb-3 border-b pb-2">{frequency}</h3>
+                  <ul className="space-y-2">
+                    {groupedTasks[frequency].map((task) => (
+                      <li
+                        key={task.id}
+                        className="bg-gray-100 p-4 rounded-lg shadow-sm flex justify-between items-center"
+                      >
+                        <div>
+                          <p className="font-bold">{task.title}</p>
+                          <p className="text-sm text-gray-600">
+                            {task.points} pts • Max/day: {task.max_per_day}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => startEdit(task)}
+                          className="text-blue-600 font-medium hover:underline text-xl"
+                        >
+                          ✏️
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </>
         )}
         {activeTab === "kids" && <KidsOverview kids={kids} />}
         {activeTab === "bonus" && (
@@ -190,88 +289,6 @@ export default function Admin() {
             </button>
           </div>
         )}
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow space-y-4 mb-8">
-          <h2 className="text-lg font-semibold text-gray-800">
-            {isEditing ? "✏️ Edit Task" : "➕ Add New Task"}
-          </h2>
-
-          <input
-            type="text"
-            name="title"
-            placeholder="Task title"
-            value={form.title}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded-md text-black"
-          />
-          <input
-            type="number"
-            name="points"
-            value={form.points}
-            onChange={handleChange}
-            placeholder="Points"
-            className="w-full p-3 border border-gray-300 rounded-md text-black"
-          />
-          <input
-            type="number"
-            name="max_per_day"
-            value={form.max_per_day}
-            onChange={handleChange}
-            placeholder="Max per day"
-            className="w-full p-3 border border-gray-300 rounded-md text-black"
-          />
-          <select
-            name="frequency"
-            value={form.frequency}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md text-black"
-          >
-            <option value="once">Once</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-          </select>
-          <input
-            type="text"
-            name="photo_url"
-            value={form.photo_url}
-            onChange={handleChange}
-            placeholder="Image URL (optional)"
-            className="w-full p-3 border border-gray-300 rounded-md text-black"
-          />
-
-          <button
-            type="submit"
-            className={`w-full py-3 rounded-md font-bold text-white ${
-              isEditing ? "bg-yellow-500 hover:bg-yellow-600" : "bg-black hover:bg-gray-800"
-            }`}
-          >
-            {isEditing ? "💾 Save Changes" : "➕ Add Task"}
-          </button>
-        </form>
-
-        <h2 className="text-xl font-semibold mb-2">Current Tasks</h2>
-        <ul className="space-y-2 mb-8">
-          {tasks.map((task) => (
-            <li
-              key={task.id}
-              className="bg-gray-100 p-4 rounded flex justify-between items-center"
-            >
-              <div>
-                <p className="font-bold">{task.title}</p>
-                <p className="text-sm text-gray-600">
-                  {task.points} pts • {task.frequency} • Max/day: {task.max_per_day}
-                </p>
-              </div>
-              <button
-                onClick={() => startEdit(task)}
-                className="text-blue-600 font-medium hover:underline"
-              >
-                ✏️ Edit
-              </button>
-            </li>
-          ))}
-        </ul>
-
 
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-2">👀 Preview As Kid</h2>
