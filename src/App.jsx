@@ -104,12 +104,12 @@ function App() {
   if (!error && data.length > 0) {
     setGoal(data[0]);
   }    
-
+};
 
   const fetchTasks = async () => {
     const { data, error } = await supabase
       .from("tasks")
-      .select("*")
+      .select("*");
       // Assuming tasks are global and not user-specific.
       // If tasks are meant to be user-specific, the admin panel needs to assign user_ids.
     if (!error) setTasks(data);
@@ -126,39 +126,39 @@ function App() {
     if (!error) setCompletionsToday(data);
   };
 
-const handleComplete = async (task) => {
-  // 1. Check today's completions
-  const { data: completions, error: fetchError } = await supabase
-  .from("task_completions")
-  .select("*", { count: "exact" })
-  .eq("user_id", user.id)
-  .eq("task_id", task.id)
-  .gte("completed_at", startOfDay(new Date()).toISOString())
-  .lte("completed_at", endOfDay(new Date()).toISOString());
+  const handleComplete = async (task) => {
+    // 1. Check today's completions
+    const { data: completions } = await supabase
+      .from("task_completions")
+      .select("*", { count: "exact" })
+      .eq("user_id", user.id)
+      .eq("task_id", task.id)
+      .gte("completed_at", startOfDay(new Date()).toISOString())
+      .lte("completed_at", endOfDay(new Date()).toISOString());
 
-const countToday = completions?.length || 0;
+    const countToday = completions?.length || 0;
 
-  if (countToday >= task.max_per_day) {
-    alert("Limit reached for today.");
-    return;
-  }
+    if (countToday >= task.max_per_day) {
+      alert("Limit reached for today.");
+      return;
+    }
 
-  // 2. Mark the task as completed (record it)
-  const { error: insertError } = await supabase.from("task_completions").insert([
-    {
-      user_id: user.id,
-      task_id: task.id,
-    },
-  ]);
+    // 2. Mark the task as completed (record it)
+    const { error: insertError } = await supabase.from("task_completions").insert([
+      {
+        user_id: user.id,
+        task_id: task.id,
+      },
+    ]);
 
-  if (!insertError) {
-    fetchTasks();
-    fetchCompletions();
-    alert(`Task "${task.title}" completed! You earned ${task.points} points.`);
-  } else {
-    console.error("Error saving task completion:", insertError.message);
-  }
-};
+    if (!insertError) {
+      fetchTasks();
+      fetchCompletions();
+      alert(`Task "${task.title}" completed! You earned ${task.points} points.`);
+    } else {
+      console.error("Error saving task completion:", insertError.message);
+    }
+  };
 
   const remainingPoints = childGoal - availablePoints;
 
