@@ -1,0 +1,19 @@
+{
+  "welcome": "Welcome",
+  "uploadPhoto": "Upload Photo",
+  "completeTask": "Complete Task",
+  "store": {
+    "title": "Reward Store",
+    "balance": "Your balance",
+    "redeem": "Redeem",
+    "purchased": "Purchased!",
+    "requested": "Requested (Pending)",
+    "cooldown": "Cooldown ({{days}}d)",
+    "notEnough": "Not enough points",
+    "request": "Request",
+    "cooldownActive": "Cooldown Active",
+    "timeLeft": "Time left",
+    "dayCooldown": "{{days}}-day cooldown"
+  }
+}
+

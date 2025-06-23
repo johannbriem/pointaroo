@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { useOutletContext } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function formatRemainingTime(milliseconds) {
   if (milliseconds <= 0) {
@@ -32,6 +33,7 @@ export default function Store() {
   const [rewardRequests, setRewardRequests] = useState([]);
   const [rewards, setRewards] = useState([]);
   const [_, forceUpdate] = useState(Date.now()); // For live countdown
+  const { t } = useTranslation();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -191,10 +193,10 @@ export default function Store() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-white mb-3 flex justify-center items-center gap-2">
           <span>🎁</span> 
-          <span>Reward Store</span>
+          <span>{t("store.title")}</span>
         </h1>
         <div className="inline-block px-4 py-2 bg-yellow-200 text-yellow-900 rounded-full text-sm font-semibold shadow-md">
-          ⭐ Your balance: <span className="font-bold">{balance} pts</span>
+          ⭐ {t("store.balance")}: <span className="font-bold">{balance} pts</span>
         </div>
       </div>
 
@@ -207,12 +209,12 @@ export default function Store() {
           const underCooldown = cooldownInfo.isUnderCooldown;
           const isDisabled = !afford || purchased || pendingRequest || underCooldown;
 
-          let buttonText = "Redeem";
-          if (purchased) buttonText = "Purchased!";
-          else if (pendingRequest) buttonText = "Requested (Pending)";
-          else if (underCooldown) buttonText = `Cooldown (${reward.request_cooldown_days}d)`;
-          else if (!afford) buttonText = "Not enough points";
-          else if (reward.requires_approval) buttonText = "Request";
+          let buttonText = t("store.redeem");
+          if (purchased) buttonText = t("store.purchased");
+          else if (pendingRequest) buttonText = t("store.requested");
+          else if (underCooldown) buttonText = t("store.cooldown", { days: reward.request_cooldown_days });
+          else if (!afford) buttonText = t("store.notEnough");
+          else if (reward.requires_approval) buttonText = t("store.request");
 
           return (
             <div
@@ -238,7 +240,7 @@ export default function Store() {
                 <h2 className="text-lg font-semibold mb-1">{reward.name}</h2>
                 {reward.request_cooldown_days > 0 && (
                   <p className="text-xs text-purple-600 font-semibold mb-1">
-                    {reward.request_cooldown_days}-day cooldown
+                    {t("store.dayCooldown", { days: reward.request_cooldown_days })}
                   </p>
                 )}
                 <p className="text-sm flex-grow">{reward.description}</p>
@@ -248,11 +250,11 @@ export default function Store() {
                   <div className="mt-3 px-4 py-3 bg-blue-100 border border-blue-300 rounded-xl shadow-inner">
                     <div className="flex items-center text-blue-900 mb-2">
                       <span className="text-xl mr-2 animate-pulse">⏳</span>
-                      <span className="font-semibold">Cooldown Active</span>
+                      <span className="font-semibold">{t("store.cooldownActive")}</span>
                     </div>
                     <div className="ml-6 text-sm text-blue-800">
                       <p>
-                        <span className="font-medium">Time left:</span>{" "}
+                        <span className="font-medium">{t("store.timeLeft")}:</span>{" "}
                         {formatRemainingTime(cooldownInfo.remainingTime)}
                       </p>
                     </div>

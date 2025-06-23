@@ -5,6 +5,7 @@ import TaskList from "./components/TaskList";
 import ProgressBar from "./components/ProgressBar";
 import { startOfDay, endOfDay } from "date-fns"; // for date range filtering
 import GoalModal from "./components/GoalModal";
+import './i18n';
 
 const GOAL = 100;
 

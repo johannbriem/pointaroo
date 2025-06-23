@@ -1,0 +1,19 @@
+{
+  "welcome": "Velkomin",
+  "uploadPhoto": "Hlaða inn mynd",
+  "completeTask": "Klára verkefni",
+  "store": {
+    "title": "Verðlaunabúð",
+    "balance": "Staða",
+    "redeem": "Innleysa",
+    "purchased": "Kaupin lokið!",
+    "requested": "Beðið (bíður samþykkis)",
+    "cooldown": "Kælitími ({{days}} dagar)",
+    "notEnough": "Ekki næg stig",
+    "request": "Senda beiðni",
+    "cooldownActive": "Kælitími virkur",
+    "timeLeft": "Tími eftir",
+    "dayCooldown": "{{days}} daga kælitími"
+  }
+}
+
