@@ -55,6 +55,7 @@ export default function Store() {
   const spentPoints = purchasedPoints + pendingRequestedPoints;
   const availablePoints = earnedPoints - spentPoints;
   const balance = availablePoints;
+  // The `balance` variable now correctly reflects the user's available points.
   // --- End re-introduction ---
 
   // Check if a reward has been purchased by the user
@@ -146,6 +147,51 @@ export default function Store() {
           );
         })}
       </div>
+
+      <h2 className="text-2xl font-bold mb-4 mt-8">My Requests</h2>
+      {rewardRequests.length === 0 ? (
+        <p className="text-gray-500">You have no reward requests yet.</p>
+      ) : (
+        <div className="space-y-4">
+          {rewardRequests.map((request) => (
+            <div key={request.id} className="bg-white p-4 rounded-lg shadow-sm border flex items-center">
+              {request.rewards?.photo_url && (
+                <img
+                  src={request.rewards.photo_url}
+                  alt={request.rewards.name}
+                  className="w-16 h-16 object-cover rounded mr-4"
+                />
+              )}
+              <div className="flex-grow">
+                <p className="font-bold text-lg">{request.rewards?.name || 'Unknown Reward'}</p>
+                <p className="text-sm text-gray-600">Cost: {request.points_deducted} pts</p>
+                <p className="text-sm text-gray-600">
+                  Status:{" "}
+                  <span
+                    className={`font-semibold ${
+                      request.status === "pending"
+                        ? "text-yellow-600"
+                        : request.status === "approved"
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                  </span>
+                </p>
+                <p className="text-xs text-gray-500">
+                  Requested: {new Date(request.requested_at).toLocaleString()}
+                </p>
+                {request.approved_at && (
+                  <p className="text-xs text-gray-500">
+                    Processed: {new Date(request.approved_at).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -32,6 +32,7 @@ export default function Admin() {
     photo_url: "",
     requires_approval: false,
   });
+  const [historyFilter, setHistoryFilter] = useState('all');
 
   useEffect(() => {
     const loadUserAndRole = async () => {
@@ -509,7 +510,7 @@ export default function Admin() {
                       )}
                       <div>
                         <p className="font-bold text-lg">{request.rewards?.name || 'Unknown Reward'}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600"> {/* Changed request.profiles?.email to request.user?.email */}
                           Requested by: {request.user?.display_name || request.profiles?.email || 'Unknown User'}
                         </p>
                         <p className="text-sm text-gray-600">
@@ -539,7 +540,41 @@ export default function Admin() {
               </div>
             )}
             <h3 className="text-lg font-semibold mt-8 mb-2">All Reward Requests (History)</h3>
-            {/* You can add a section here to view approved/rejected requests if needed */}
+            <div className="flex space-x-2 mb-4">
+              <button onClick={() => setHistoryFilter('all')} className={`px-3 py-1 rounded ${historyFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}>All</button>
+              <button onClick={() => setHistoryFilter('pending')} className={`px-3 py-1 rounded ${historyFilter === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Pending</button>
+              <button onClick={() => setHistoryFilter('approved')} className={`px-3 py-1 rounded ${historyFilter === 'approved' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Approved</button>
+              <button onClick={() => setHistoryFilter('rejected')} className={`px-3 py-1 rounded ${historyFilter === 'rejected' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}>Rejected</button>
+            </div>
+            <div className="space-y-4">
+              {rewardRequests.filter(r => historyFilter === 'all' || r.status === historyFilter).length === 0 ? (
+                <p className="text-gray-500">No requests found for this filter.</p>
+              ) : (
+                rewardRequests.filter(r => historyFilter === 'all' || r.status === historyFilter).map((request) => (
+                  <div key={request.id} className="bg-white p-4 rounded-lg shadow-sm border">
+                    <div className="flex items-center mb-2">
+                      {request.rewards?.photo_url && (
+                        <img src={request.rewards.photo_url} alt={request.rewards.name} className="w-12 h-12 object-cover rounded mr-4" />
+                      )}
+                      <div>
+                        <p className="font-bold text-lg">{request.rewards?.name || 'Unknown Reward'}</p>
+                        <p className="text-sm text-gray-600">Requested by: {request.user?.display_name || request.user?.email || 'Unknown User'}</p>
+                        <p className="text-sm text-gray-600">Cost: {request.points_deducted} pts</p>
+                        <p className="text-sm text-gray-600">
+                          Status: <span className={`font-semibold ${request.status === 'pending' ? 'text-yellow-600' : request.status === 'approved' ? 'text-green-600' : 'text-red-600'}`}>{request.status.charAt(0).toUpperCase() + request.status.slice(1)}</span>
+                        </p>
+                        <p className="text-xs text-gray-500">Requested: {new Date(request.requested_at).toLocaleString()}</p>
+                        {request.approved_at && (
+                          <p className="text-xs text-gray-500">
+                            Processed: {new Date(request.approved_at).toLocaleString()} by {request.admin?.display_name || request.admin?.email || 'Unknown Admin'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
             <p className="text-sm text-gray-500">
               Total requests: {rewardRequests.length} (Approved: {rewardRequests.filter(r => r.status === 'approved').length}, Rejected: {rewardRequests.filter(r => r.status === 'rejected').length})
             </p>
