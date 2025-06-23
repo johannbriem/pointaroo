@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { useOutletContext } from "react-router-dom"; // Import useOutletContext
+import { useTranslation } from "react-i18next";
 
 export default function Completions() {
   const { user, loading, role } = useOutletContext(); // Get user, loading, role from context
   const [completions, setCompletions] = useState([]);
   const [localLoading, setLoading] = useState(false); // Local loading state for fetchCompletions
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (user && !loading) { // Only fetch if user is loaded
@@ -29,8 +31,7 @@ export default function Completions() {
     if (!error) setCompletions(data);
     setLoading(false);
   };
-  if (loading || localLoading) return <p className="text-center mt-10">Loading...</p>;
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (loading || localLoading) return <p className="text-center mt-10">{t("common.loading")}</p>;
 
   const groupedCompletions = completions.reduce((acc, completion) => {
     const userId = completion.user_id;
@@ -49,10 +50,10 @@ export default function Completions() {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6 text-center">
-        📸 {role === "admin" ? "Task Completions" : "My Completions"}
+        📸 {role === "admin" ? t("completions.title") : t("completions.myTitle")}
       </h1>
       {completions.length === 0 ? (
-        <p className="text-center text-gray-500 mt-10">No task completions yet.</p>
+        <p className="text-center text-gray-500 mt-10">{t("completions.noCompletions")}</p>
       ) : (
         role === "admin" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -71,13 +72,13 @@ export default function Completions() {
                       <div className="flex space-x-4">
                         {item.before_photo && (
                           <div>
-                            <p className="text-xs font-semibold text-gray-600">Before:</p>
+                            <p className="text-xs font-semibold text-gray-600">{t("completions.before")}</p>
                             <img src={item.before_photo} alt="Before" className="w-32 h-32 object-cover border rounded" />
                           </div>
                         )}
                         {item.after_photo && (
                           <div>
-                            <p className="text-xs font-semibold text-gray-600">After:</p>
+                            <p className="text-xs font-semibold text-gray-600">{t("completions.after")}</p>
                             <img src={item.after_photo} alt="After" className="w-32 h-32 object-cover border rounded" />
                           </div>
                         )}
@@ -97,13 +98,13 @@ export default function Completions() {
                 <div className="flex space-x-4">
                   {item.before_photo && (
                     <div>
-                      <p className="text-xs font-semibold text-gray-600">Before:</p>
+                      <p className="text-xs font-semibold text-gray-600">{t("completions.before")}</p>
                       <img src={item.before_photo} alt="Before" className="w-32 h-32 object-cover border rounded" />
                     </div>
                   )}
                   {item.after_photo && (
                     <div>
-                      <p className="text-xs font-semibold text-gray-600">After:</p>
+                      <p className="text-xs font-semibold text-gray-600">{t("completions.after")}</p>
                       <img src={item.after_photo} alt="After" className="w-32 h-32 object-cover border rounded" />
                     </div>
                   )}

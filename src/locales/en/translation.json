@@ -1,19 +1,142 @@
 {
-  "welcome": "Welcome",
-  "uploadPhoto": "Upload Photo",
-  "completeTask": "Complete Task",
+  "common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "saveChanges": "Save Changes",
+    "add": "Add",
+    "edit": "Edit",
+    "approve": "Approve",
+    "reject": "Reject",
+    "loading": "Loading...",
+    "unknownUser": "Unknown User",
+    "unknownAdmin": "Unknown Admin",
+    "unknownReward": "Unknown Reward",
+    "on": "On",
+    "cost": "Cost",
+    "status": "Status",
+    "requestedBy": "Requested by",
+    "processed": "Processed",
+    "all": "All",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "noRequestsFound": "No requests found for this filter.",
+    "totalRequests": "Total requests",
+    "hideForm": "Hide Form",
+    "createReward": "Create Reward"
+  },
+  "app": {
+    "title": "Earn the Phone!",
+    "loginPrompt": "Log in to see your tasks and earn points toward your goal.",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "redirectingAdmin": "Redirecting to admin panel...",
+    "yourCurrentPoints": "Your Current Points:",
+    "setGoalAdmin": "Set a goal in the Admin panel to track your progress!"
+  },
+  "home": {
+    "goal": "Goal",
+    "totalCost": "Total cost",
+    "parentPays": "Parent pays",
+    "yourGoal": "Your goal"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "points": "points",
+    "completedToday": "completed today",
+    "doneForToday": "Done for today",
+    "completeTask": "Complete Task",
+    "taskTitle": "Task title",
+    "maxPerDay": "Max per day",
+    "frequency": "Frequency",
+    "once": "Once",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "imageURL": "Image URL (optional)",
+    "currentTasks": "Current Tasks"
+  },
   "store": {
     "title": "Reward Store",
     "balance": "Your balance",
     "redeem": "Redeem",
     "purchased": "Purchased!",
     "requested": "Requested (Pending)",
-    "cooldown": "Cooldown ({{days}}d)",
+    "cooldown": "Cooldown ({{days}} days)",
     "notEnough": "Not enough points",
     "request": "Request",
+    "dayCooldown": "{{days}}-day cooldown",
     "cooldownActive": "Cooldown Active",
     "timeLeft": "Time left",
-    "dayCooldown": "{{days}}-day cooldown"
+    "lastRequested": "Last requested",
+    "availableAfter": "Available after",
+    "myRequests": "My Requests",
+    "noRequestsYet": "You have no reward requests yet."
+  },
+  "admin": {
+    "title": "Admin – Task Manager",
+    "tasksTab": "Tasks",
+    "kidsTab": "Kids",
+    "bonusTab": "Bonus",
+    "rewardsTab": "Rewards",
+    "requestsTab": "Requests",
+    "giveBonusPoints": "Give Bonus Points",
+    "manageRewards": "Manage Rewards",
+    "addReward": "Add New Reward",
+    "rewardName": "Reward Name",
+    "description": "Description",
+    "rewardCost": "Cost (points)",
+    "requiresApproval": "Requires Admin Approval",
+    "requestCooldown": "Request Cooldown (days)",
+    "currentRewards": "Current Rewards",
+    "pendingRewardRequests": "Pending Reward Requests",
+    "allRewardRequests": "All Reward Requests (History)",
+    "previewAsKid": "Preview As Kid",
+    "editKidGoals": "Edit Kid Goals",
+    "phoneModel": "Phone Model",
+    "totalCost": "Total Cost",
+    "parentPercent": "Parent %",
+    "imageURL": "Image URL",
+    "saveGoal": "Save Goal",
+    "selectKid": "Select kid to preview",
+    "adminAccessOnly": "❌ Admin access only"
+  },
+  "completions": {
+    "title": "Task Completions",
+    "myTitle": "My Completions",
+    "noCompletions": "No task completions yet.",
+    "before": "Before:",
+    "after": "After:"
+  },
+  "loginPage": {
+    "title": "Log In",
+    "email": "Email",
+    "password": "Password"
+  },
+  "signupPage": {
+    "title": "Sign Up",
+    "savingFor": "What are you saving for?",
+    "optionalLink": "Optional link to the item",
+    "iamKid": "👧 I'm a Kid",
+    "iamParent": "👨‍👩‍👧 I'm a Parent"
+  },
+  "auth": {
+    "haveAccount": "Have an account? Log in",
+    "noAccount": "No account? Sign up"
+  },
+  "navbar": {
+    "store": "Store",
+    "completions": "Completions",
+    "admin": "Admin",
+    "myGoal": "My Goal",
+    "installApp": "Install App",
+    "logout": "Logout"
+  },
+  "taskModal": {
+    "beforePhoto": "📸 Before Photo",
+    "afterPhoto": "📸 After Photo",
+    "confirmCompletion": "Confirm Completion",
+    "saving": "Saving..."
   }
 }
-

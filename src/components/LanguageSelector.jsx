@@ -37,7 +37,7 @@ export default function LanguageSelector({ userId }) {
   };
 
   return (
-    <select value={selected} onChange={handleChange} className="p-2 rounded">
+    <select value={selected} onChange={handleChange} className="p-2 rounded text-black"> {/* Added text-black for visibility */}
       <option value="en">English</option>
       <option value="is">Íslenska</option>
     </select>

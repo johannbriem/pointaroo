@@ -3,6 +3,7 @@ import { supabase } from "../supabaseClient";
 import KidPreview from "../components/KidPreview";
 import KidsOverview from "../components/KidsOverview";
 import BonusPointsForm from "../components/BonusModal";
+import { useTranslation } from "react-i18next";
 
 export default function Admin() {
   const [user, setUser] = useState(null);
@@ -36,6 +37,7 @@ export default function Admin() {
   const [isEditingReward, setIsEditingReward] = useState(false);
   const [editingRewardId, setEditingRewardId] = useState(null);
   const [historyFilter, setHistoryFilter] = useState('all');
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadUserAndRole = async () => {
@@ -330,26 +332,26 @@ export default function Admin() {
   return (
     <>
       <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-4">🔧 Admin – Task Manager</h1>
+        <h1 className="text-2xl font-bold mb-4 text-white">{t("admin.title")}</h1>
         <div className="flex gap-4 mb-4">
-          <button onClick={() => setActiveTab("tasks")}>🧱 Tasks</button>
-          <button onClick={() => setActiveTab("kids")}>👨‍👧 Kids</button>
-          <button onClick={() => setActiveTab("bonus")}>🎁 Bonus</button>
-          <button onClick={() => setActiveTab("rewards")}>🎁 Rewards</button>
-          <button onClick={() => setActiveTab("requests")}>✉️ Requests ({rewardRequests.filter(r => r.status === 'pending').length})</button>
+          <button onClick={() => setActiveTab("tasks")}>🧱 {t("admin.tasksTab")}</button>
+          <button onClick={() => setActiveTab("kids")}>👨‍👧 {t("admin.kidsTab")}</button>
+          <button onClick={() => setActiveTab("bonus")}>🎁 {t("admin.bonusTab")}</button>
+          <button onClick={() => setActiveTab("rewards")}>🎁 {t("admin.rewardsTab")}</button>
+          <button onClick={() => setActiveTab("requests")}>✉️ {t("admin.requestsTab")} ({rewardRequests.filter(r => r.status === 'pending').length})</button>
         </div>
 
         {activeTab === "tasks" && (
           <>
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow space-y-4 mb-8">
               <h2 className="text-lg font-semibold text-gray-800">
-                {isEditing ? "✏️ Edit Task" : "➕ Add New Task"}
+                {isEditing ? `✏️ ${t("common.edit")} ${t("tasks.title")}` : `➕ ${t("common.add")} ${t("tasks.title")}`}
               </h2>
 
               <input
                 type="text"
                 name="title"
-                placeholder="Task title"
+                placeholder={t("tasks.taskTitle")}
                 value={form.title}
                 onChange={handleChange}
                 required
@@ -360,7 +362,7 @@ export default function Admin() {
                 name="points"
                 value={form.points}
                 onChange={handleChange}
-                placeholder="Points"
+                placeholder={t("tasks.points")}
                 className="w-full p-3 border border-gray-300 rounded-md text-black"
               />
               <input
@@ -368,7 +370,7 @@ export default function Admin() {
                 name="max_per_day"
                 value={form.max_per_day}
                 onChange={handleChange}
-                placeholder="Max per day"
+                placeholder={t("tasks.maxPerDay")}
                 className="w-full p-3 border border-gray-300 rounded-md text-black"
               />
               <select
@@ -377,16 +379,16 @@ export default function Admin() {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-md text-black"
               >
-                <option value="once">Once</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
+                <option value="once">{t("tasks.once")}</option>
+                <option value="daily">{t("tasks.daily")}</option>
+                <option value="weekly">{t("tasks.weekly")}</option>
               </select>
               <input
                 type="text"
                 name="photo_url"
                 value={form.photo_url}
                 onChange={handleChange}
-                placeholder="Image URL (optional)"
+                placeholder={t("tasks.imageURL")}
                 className="w-full p-3 border border-gray-300 rounded-md text-black"
               />
 
@@ -396,11 +398,11 @@ export default function Admin() {
                   isEditing ? "bg-yellow-500 hover:bg-yellow-600" : "bg-black hover:bg-gray-800"
                 }`}
               >
-                {isEditing ? "💾 Save Changes" : "➕ Add Task"}
+                {isEditing ? `💾 ${t("common.saveChanges")}` : `➕ ${t("common.add")} ${t("tasks.title")}`}
               </button>
             </form>
 
-            <h2 className="text-xl font-semibold mb-2">Current Tasks</h2>
+            <h2 className="text-xl font-semibold mb-2">{t("tasks.currentTasks")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {sortedFrequencies.map((frequency) => (
                 <div key={frequency}>
@@ -414,7 +416,7 @@ export default function Admin() {
                         <div>
                           <p className="font-bold">{task.title}</p>
                           <p className="text-sm text-gray-600">
-                            {task.points} pts • Max/day: {task.max_per_day}
+                            {task.points} {t("tasks.points")} • {t("tasks.maxPerDay")}: {task.max_per_day}
                           </p>
                         </div>
                         <button
@@ -434,12 +436,12 @@ export default function Admin() {
         {activeTab === "kids" && <KidsOverview kids={kids} />}
         {activeTab === "bonus" && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-2">🎁 Give Bonus Points</h2>
+            <h2 className="text-xl font-semibold mb-2">🎁 {t("admin.giveBonusPoints")}</h2>
             <button
               onClick={() => setShowBonusModal(true)}
               className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
             >
-              Give Bonus Points
+              {t("admin.giveBonusPoints")}
             </button>
           </div>
         )}
