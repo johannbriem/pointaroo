@@ -5,6 +5,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import ProgressBar from "../components/ProgressBar";
 import { startOfDay, endOfDay } from "date-fns";
 import { useTranslation } from "react-i18next";
+import LandingPage from "./LandingPage";
 
 const GOAL = 100;
 
@@ -20,6 +21,11 @@ export default function Home() {
   const [rewards, setRewards] = useState([]);
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Set the document title for the main app view
+    document.title = t("app.title");
+  }, [t]);
 
   useEffect(() => {
     if (user) {
@@ -114,9 +120,6 @@ export default function Home() {
   };
 
   const handleTaskSuccessfullyCompleted = async (task) => {
-    // This function is now a callback for after the modal successfully completes a task.
-    // It's responsible for refreshing the UI and showing feedback.
-    // The actual DB insert is handled in TaskModal.
     await Promise.all([fetchCompletionsToday(), fetchAllCompletions()]);
     alert(`Task "${task.title}" completed! You earned ${task.points} points.`);
   };
@@ -150,22 +153,7 @@ export default function Home() {
   }
 
   if (!user) {
-    return (
-      <div className="max-w-lg mx-auto mt-10 text-center">
-        <h1 className="text-3xl font-bold mb-4">📱 {t("app.title")}</h1>
-        <p className="mb-6 text-gray-600">
-          {t("app.loginPrompt")}
-        </p>
-        <div className="flex gap-4 justify-center">
-          <a href="/login" className="bg-blue-600 text-white px-4 py-2 rounded"> {/* Translated "Log In" */}
-            {t("app.login")}
-          </a>
-          <a href="/signup" className="bg-green-600 text-white px-4 py-2 rounded"> {/* Translated "Sign Up" */}
-            {t("app.signup")}
-          </a>
-        </div>
-      </div>
-    );
+    return <LandingPage />;
   }
 
   // If user is an admin, show a redirect message while the useEffect navigates them.

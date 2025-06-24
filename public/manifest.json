@@ -1,11 +1,11 @@
 {
-  "name": "Earn The Phone",
-  "short_name": "EarnPhone",
+  "name": "Pointaroo",
+  "short_name": "Pointaroo",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4F46E5",
-  "description": "Complete tasks, earn points, get your dream phone!",
+  "description": "Complete tasks, earn points, and redeem rewards with Pointaroo, the ultimate task management app for kids and parents.",
   "icons": [
     {
       "src": "/icons/icon-192.png",

@@ -109,11 +109,16 @@
     "before": "Fyrir:",
     "after": "Eftir:"
   },
-  "loginPage": {
-    "title": "Innskráning",
+  "login": {
+    "login": "Innskrá",
+    "loggingIn": "Skrái inn...",
+    "subtitle": "Skráðu þig inn á reikninginn þinn",
     "email": "Netfang",
-    "password": "Lykilorð"
-  },
+    "password": "Lykilorð",
+    "forgotPassword": "Gleymt lykilorð?",
+    "noAccount": "Ertu ekki með aðgang?",
+    "signup": "Nýskráning"
+},
   "signupPage": {
     "title": "Nýskráning",
     "savingFor": "Hvað ertu að safna fyrir?",

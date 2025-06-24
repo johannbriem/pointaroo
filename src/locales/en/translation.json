@@ -109,11 +109,16 @@
     "before": "Before:",
     "after": "After:"
   },
-  "loginPage": {
-    "title": "Log In",
+  "login": {
+    "login": "Log In",
+    "loggingIn": "Logging in...",
+    "subtitle": "Log in to your account",
     "email": "Email",
-    "password": "Password"
-  },
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "signup": "Sign up"
+},
   "signupPage": {
     "title": "Sign Up",
     "savingFor": "What are you saving for?",
@@ -138,5 +143,16 @@
     "afterPhoto": "📸 After Photo",
     "confirmCompletion": "Confirm Completion",
     "saving": "Saving..."
-  }
+  },
+  "landing": {
+    "subtitle": "A fun way for kids to earn their phone and build healthy habits.",
+    "howTitle": "How it works",
+    "setGoal": "Set a goal",
+    "setGoalText": "Pick a phone model and let kids know what they’re working toward.",
+    "completeTasks": "Complete tasks",
+    "completeTasksText": "Kids upload before/after photos to earn points for chores.",
+    "redeemRewards": "Earn rewards",
+    "redeemRewardsText": "Track progress, unlock rewards, and reach their goal!",
+    "ready": "Ready to start your Pointaroo journey?"
+}
 }
