@@ -1,45 +1,90 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  useEffect(() => {
+    // Set a specific title for the login page
+    document.title = `${t("login.login")} - ${t("app.title")}`;
+  }, [t]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    setLoading(false);
     if (error) {
-      setError(error.message);
+      alert("Login failed: " + error.message);
     } else {
-      const role = data.user.user_metadata?.role;
-      if (role === "admin") navigate("/admin");
-      else navigate("/");
+      navigate("/");
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) return alert("Enter your email first.");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) alert("Failed to send reset email");
+    else alert("Password reset link sent!");
+  };
+
   return (
-    <div className="p-4 max-w-sm mx-auto">
-      <h2 className="text-xl font-bold mb-4">Log In</h2>
-      <input
-        type="email"
-        className="w-full p-2 border mb-2"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        className="w-full p-2 border mb-2"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleLogin} className="bg-blue-500 text-white w-full py-2 rounded">
-        Log In
-      </button>
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-white rounded-lg shadow-lg p-6 text-gray-900">
+        <div className="text-center mb-6 flex flex-col items-center">
+          <img src="/logo.png" alt="Pointaroo" className="h-12 mb-2" />
+          <p className="text-sm text-gray-600">{t("login.subtitle", "Log in to your account")}</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder={t("login.email", "Email")}
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={t("login.password", "Password")}
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
+          >
+            {loading ? t("login.loggingIn", "Logging in...") : t("login.login", "Log In")}
+          </button>
+        </form>
+
+        <div className="text-sm text-center mt-4 space-y-2">
+          <button
+            onClick={handleForgotPassword}
+            className="text-blue-600 hover:underline"
+          >
+            {t("login.forgotPassword", "Forgot password?")}
+          </button>
+          <p>
+            {t("login.noAccount", "Don't have an account?")}{" "}
+            <Link to="/signup" className="text-blue-600 hover:underline">
+              {t("login.signup", "Sign up")}
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

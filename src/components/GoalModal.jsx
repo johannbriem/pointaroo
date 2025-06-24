@@ -52,37 +52,37 @@ export default function GoalModal({ user, onClose }) {
   if (loading) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-lg text-black space-y-4">
-        <h2 className="text-xl font-bold">🎯 My Goal & Name</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 p-6 rounded-xl max-w-md w-full shadow-2xl text-white space-y-4 border border-gray-700">
+        <h2 className="text-xl font-bold text-gray-100">🎯 My Goal & Name</h2>
 
         <input
           type="text"
           placeholder="Display name (e.g. Alice)"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
         />
         <input
           type="text"
           placeholder="What are you working toward?"
           value={goal.title}
           onChange={(e) => setGoal({ ...goal, title: e.target.value })}
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
         />
         <input
           type="text"
           placeholder="Optional link (e.g. Amazon)"
           value={goal.link}
           onChange={(e) => setGoal({ ...goal, link: e.target.value })}
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
         />
 
-        <div className="flex justify-end gap-3">
-          <button onClick={onClose} className="text-gray-600 hover:underline">Cancel</button>
+        <div className="flex justify-end gap-4 pt-2">
+          <button onClick={onClose} className="text-gray-400 hover:text-white font-medium px-4 py-2 rounded-md transition-colors">Cancel</button>
           <button
             onClick={handleSave}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+            className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-5 py-2 rounded-md transition-colors shadow-lg"
           >
             Save
           </button>
