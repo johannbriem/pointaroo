@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 
 export default function Signup() {
   const [email, setEmail] = useState("");
+  const { t } = useTranslation();
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("kid");
   const [goal, setGoal] = useState("");
   const [goalLink, setGoalLink] = useState("");
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
   
   const handleSignup = async () => {
     setError(null);
@@ -34,7 +38,8 @@ export default function Signup() {
       ]);
     }
 
-    alert("Signup successful!");
+    alert("Signup successful!"); // Consider replacing this with a more subtle notification
+    navigate("/login"); // Redirect to login page after successful signup
   };
 
   return (
