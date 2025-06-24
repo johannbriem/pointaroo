@@ -10,6 +10,7 @@ import Home from "./pages/Home.jsx";
 import Layout from "./Layout.jsx"; // ✅ import Layout component
 import Login from "./pages/Login.jsx"; // ✅ import Login page
 import Signup from "./pages/Signup.jsx"; // ✅ import Signup page
+import './i18n';
 
 function StoreRouteWrapper() {
   const [user, setUser] = useState(null);

@@ -1,14 +1,16 @@
 import { useState } from "react";
 import TaskModal from "./TaskModal";
+import { useTranslation } from "react-i18next";
 
 export default function TaskList({ tasks = [], onComplete, completionsToday = [], userId }) {
   const getTodayCount = (taskId) =>
     completionsToday.filter((c) => c.task_id === taskId).length;
   const [selectedTask, setSelectedTask] = useState(null);
+  const { t } = useTranslation();
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
-      <h2 className="text-2xl font-semibold mb-6 text-center">📋 Tasks</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-center">📋 {t("tasks.title")}</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {tasks.map((task) => {
@@ -33,11 +35,11 @@ export default function TaskList({ tasks = [], onComplete, completionsToday = []
               </div>
 
               <h3 className="text-xl font-bold text-gray-800">{task.title}</h3>
-              <p className="text-yellow-500 font-semibold my-1">
-                ⭐ {task.points} points
+              <p className="text-yellow-500 font-semibold my-1"> {/* Translated "points" */}
+                ⭐ {task.points} {t("tasks.points")}
               </p>
               <p className="text-sm text-gray-500 mb-4">
-                {doneToday} / {task.max_per_day} completed today
+                {doneToday} / {task.max_per_day} {t("tasks.completedToday")} {/* Translated "completed today" */}
               </p>
 
               <button
@@ -49,7 +51,7 @@ export default function TaskList({ tasks = [], onComplete, completionsToday = []
                     : "bg-green-500 hover:bg-green-600"
                 }`}
               >
-                {limitReached ? "Done for today" : "Complete Task"}
+                {limitReached ? t("tasks.doneForToday") : t("tasks.completeTask")} {/* Translated "Done for today" and "Complete Task" */}
               </button>
             </div>
           );

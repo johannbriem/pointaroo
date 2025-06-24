@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
-
+import { useTranslation } from "react-i18next";
+ 
 export default function TaskModal({ task, userId, onClose, onCompleted }) {
   const [beforeFile, setBeforeFile] = useState(null);
   const [afterFile, setAfterFile] = useState(null);
@@ -37,6 +38,7 @@ export default function TaskModal({ task, userId, onClose, onCompleted }) {
       alert("Failed to complete task");
     }
   };
+  const { t } = useTranslation();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -44,8 +46,8 @@ export default function TaskModal({ task, userId, onClose, onCompleted }) {
         <h2 className="text-xl font-bold">{task.title}</h2>
 
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-                📸 Before Photo
+            <label className="block text-sm font-medium text-gray-700 mb-1"> {/* Translated "Before Photo" */}
+                {t("taskModal.beforePhoto")}
             </label>
             <input
                 type="file"
@@ -56,8 +58,8 @@ export default function TaskModal({ task, userId, onClose, onCompleted }) {
             </div>
 
             <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-                📸 After Photo
+            <label className="block text-sm font-medium text-gray-700 mb-1"> {/* Translated "After Photo" */}
+                {t("taskModal.afterPhoto")}
             </label>
             <input
                 type="file"
@@ -68,15 +70,15 @@ export default function TaskModal({ task, userId, onClose, onCompleted }) {
             </div>
 
         <div className="flex justify-end space-x-2 pt-2">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
-            Cancel
+          <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded"> {/* Translated "Cancel" */}
+            {t("common.cancel")}
           </button>
           <button
             onClick={handleComplete}
             disabled={submitting}
             className="px-4 py-2 bg-green-600 text-white rounded"
           >
-            {submitting ? "Saving..." : "Confirm Completion"}
+            {submitting ? t("taskModal.saving") : t("taskModal.confirmCompletion")} {/* Translated "Saving..." and "Confirm Completion" */}
           </button>
         </div>
       </div>

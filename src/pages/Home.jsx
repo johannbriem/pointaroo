@@ -4,6 +4,7 @@ import TaskList from "../components/TaskList";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import ProgressBar from "../components/ProgressBar";
 import { startOfDay, endOfDay } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const GOAL = 100;
 
@@ -17,6 +18,7 @@ export default function Home() {
   const [goal, setGoal] = useState(null);
   const [purchases, setPurchases] = useState([]);
   const [rewards, setRewards] = useState([]);
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -150,16 +152,16 @@ export default function Home() {
   if (!user) {
     return (
       <div className="max-w-lg mx-auto mt-10 text-center">
-        <h1 className="text-3xl font-bold mb-4">📱 Earn Your Phone</h1>
+        <h1 className="text-3xl font-bold mb-4">📱 {t("app.title")}</h1>
         <p className="mb-6 text-gray-600">
-          Log in to see your tasks and earn points toward your goal.
+          {t("app.loginPrompt")}
         </p>
         <div className="flex gap-4 justify-center">
-          <a href="/login" className="bg-blue-600 text-white px-4 py-2 rounded">
-            Log In
+          <a href="/login" className="bg-blue-600 text-white px-4 py-2 rounded"> {/* Translated "Log In" */}
+            {t("app.login")}
           </a>
-          <a href="/signup" className="bg-green-600 text-white px-4 py-2 rounded">
-            Sign Up
+          <a href="/signup" className="bg-green-600 text-white px-4 py-2 rounded"> {/* Translated "Sign Up" */}
+            {t("app.signup")}
           </a>
         </div>
       </div>
@@ -168,14 +170,14 @@ export default function Home() {
 
   // If user is an admin, show a redirect message while the useEffect navigates them.
   if (role === "admin") {
-    return <p className="text-center mt-10 text-gray-500">Redirecting to admin panel...</p>;
+    return <p className="text-center mt-10 text-gray-500">{t("app.redirectingAdmin")}</p>;
   }
 
   // For any other logged-in user (e.g., 'kid' or no role set), show the task view.
   // This is a safer default than a blank page.
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 text-center">
-      <h1 className="text-3xl font-bold mb-4">📱 Earn the Phone!</h1>
+      <h1 className="text-3xl font-bold mb-4">📱 {t("app.title")}</h1>
 
       {goal ? ( // Conditional rendering based on whether a goal exists
         <>
@@ -188,12 +190,12 @@ export default function Home() {
               />
             )}
             <div className="flex-1">
-              <h2 className="text-xl font-bold mb-2">🎯 Goal: {goal.phone_model}</h2>
+              <h2 className="text-xl font-bold mb-2">🎯 {t("home.goal")}: {goal.phone_model}</h2>
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                <p><span className="font-semibold">Total cost:</span> ${goal.total_cost}</p>
-                <p><span className="font-semibold">Parent pays:</span> {goal.parent_percent}%</p>
-                <p className="col-span-2 text-base font-bold text-green-600">
-                  Your goal: ${Math.ceil(goal.total_cost * (1 - goal.parent_percent / 100))}
+                <p><span className="font-semibold">{t("home.totalCost")}:</span> ${goal.total_cost}</p>
+                <p><span className="font-semibold">{t("home.parentPays")}:</span> {goal.parent_percent}%</p>
+                <p className="col-span-2 text-base font-bold text-green-600"> {/* Translated "Your goal" */}
+                  {t("home.yourGoal")}: ${Math.ceil(goal.total_cost * (1 - goal.parent_percent / 100))}
                 </p>
               </div>
             </div>
@@ -203,9 +205,9 @@ export default function Home() {
       ) : (
         // No goal set, show just the total points
         <div className="mb-6 p-4 rounded-lg bg-blue-50 text-center">
-          <h2 className="text-xl font-bold text-blue-800 mb-2">Your Current Points:</h2>
-          <p className="text-4xl font-extrabold text-blue-900">{availablePoints} pts</p>
-          <p className="text-sm text-blue-700 mt-2">Set a goal in the Admin panel to track your progress!</p>
+          <h2 className="text-xl font-bold text-blue-800 mb-2">{t("app.yourCurrentPoints")}</h2>
+          <p className="text-4xl font-extrabold text-blue-900">{availablePoints} {t("tasks.points")}</p>
+          <p className="text-sm text-blue-700 mt-2">{t("app.setGoalAdmin")}</p>
         </div>
       )}
       <TaskList

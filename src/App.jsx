@@ -5,6 +5,7 @@ import TaskList from "./components/TaskList";
 import ProgressBar from "./components/ProgressBar";
 import { startOfDay, endOfDay } from "date-fns"; // for date range filtering
 import GoalModal from "./components/GoalModal";
+import './i18n';
 
 const GOAL = 100;
 
@@ -14,7 +15,6 @@ function App() {
   const [completionsToday, setCompletionsToday] = useState([]);
   const [goal, setGoal] = useState(null);
   const childGoal = goal ? goal.total_cost * (1 - goal.parent_percent / 100) : GOAL;
-  const [userRole, setUserRole] = useState(null);
   const [purchases, setPurchases] = useState([]);
   const [rewards, setRewards] = useState([]);
   const [showGoalModal, setShowGoalModal] = useState(false);
@@ -69,17 +69,13 @@ function App() {
       if (user) {
         setUser(user);
 
-        const { data, error } = await supabase
+        await supabase
           .from("profiles")
           .select("role")
           .eq("id", user.id)
           .single();
 
-        if (!error && data?.role) {
-          setUserRole(data.role);
-        } else {
-          setUserRole("child"); // fallback role
-        }
+        // userRole removed as it was unused
       }
     };
 
