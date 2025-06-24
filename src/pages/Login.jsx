@@ -41,8 +41,8 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
       <div className="w-full max-w-sm bg-white rounded-lg shadow-lg p-6 text-gray-900">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-blue-700 mb-2">Pointaroo</h1>
+        <div className="text-center mb-6 flex flex-col items-center">
+          <img src="/logo.png" alt="Pointaroo" className="h-12 mb-2" />
           <p className="text-sm text-gray-600">{t("login.subtitle", "Log in to your account")}</p>
         </div>
 

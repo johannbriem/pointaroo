@@ -165,7 +165,9 @@ export default function Home() {
   // This is a safer default than a blank page.
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 text-center">
-      <h1 className="text-3xl font-bold mb-4">📱 {t("app.title")}</h1>
+      <div className="flex justify-center mb-4">
+        <img src="/logo.png" alt={t("app.title")} className="h-12" />
+      </div>
 
       {goal ? ( // Conditional rendering based on whether a goal exists
         <>

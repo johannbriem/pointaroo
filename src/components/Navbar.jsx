@@ -143,9 +143,7 @@ export default function Navbar({ openGoalModal }) {
     <>
       <header className="bg-gray-800 shadow-md sticky top-0 z-30">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="text-xl font-bold text-white">
-            📱 {t("app.title")}
-          </Link>
+          <Link to="/"><img src="/logo.png" alt={t("app.title")} className="h-8" /></Link>
 
           {/* Desktop nav */}
           <div className="hidden md:flex space-x-6 items-center">{desktopNavLinks}</div>

@@ -13,7 +13,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center px-4">
       {/* Top Login Nav */}
       <header className="w-full max-w-7xl flex justify-between items-center py-4 mb-8">
-        <h1 className="text-2xl font-bold text-white">📱 Pointaroo</h1>
+        <img src="/logo.png" alt="Pointaroo" className="h-8" />
         <Link to="/login" className="text-sm font-medium text-white hover:text-yellow-400 transition">
           Log In
         </Link>
@@ -21,7 +21,7 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="text-center max-w-3xl mb-16">
-        <h2 className="text-4xl font-bold mb-4">🎯 Pointaroo</h2>
+        <img src="/logo.png" alt="Pointaroo" className="h-16 mx-auto mb-4" />
         <p className="text-lg text-gray-300">
           Help kids build healthy habits by completing chores to earn rewards —
           from their first phone to fun family experiences.
