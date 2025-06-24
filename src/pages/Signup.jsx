@@ -39,7 +39,7 @@ export default function Signup() {
     }
 
     alert("Signup successful!"); // Consider replacing this with a more subtle notification
-    navigate("/login"); // Redirect to login page after successful signup
+    navigate("/"); // Redirect to login page after successful signup
   };
 
   return (
