@@ -544,7 +544,7 @@ export default function Admin() {
                         className="bg-gray-100 p-4 rounded-lg shadow-sm flex justify-between items-center"
                       >
                         <div>
-                          <p className="font-bold">{task.title}</p>
+                          <p className="font-bold text-black">{task.title}</p>
                           <p className="text-sm text-gray-600">
                             {task.points} {t("tasks.points")} • {t("tasks.maxPerDay")}: {task.max_per_day}
                           </p>
