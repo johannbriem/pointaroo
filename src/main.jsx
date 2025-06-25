@@ -10,6 +10,7 @@ import Home from "./pages/Home.jsx";
 import Layout from "./Layout.jsx"; // ✅ import Layout component
 import Login from "./pages/Login.jsx"; // ✅ import Login page
 import Signup from "./pages/Signup.jsx"; // ✅ import Signup page
+import JoinPage from "./pages/JoinPage.jsx"; // ✅ import JoinPage for family invites
 import './i18n';
 
 function StoreRouteWrapper() {
@@ -29,13 +30,28 @@ function StoreRouteWrapper() {
     if (!user) return;
 
     const load = async () => {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("family_id")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile?.family_id) {
+        setTasks([]);
+        setRewards([]);
+        return;
+      }
+
       const [comps, tsks, rwrds, purch] = await Promise.all([
         supabase
           .from("task_completions")
           .select("*")
           .eq("user_id", user.id),
-        supabase.from("tasks").select("*"), // Fetch all global tasks
-        supabase.from("rewards").select("*"),
+        supabase.from("tasks").select("*").eq("family_id", profile.family_id),
+        supabase
+          .from("rewards")
+          .select("*")
+          .eq("family_id", profile.family_id),
         supabase.from("purchases").select("*").eq("user_id", user.id),
       ]);
 
@@ -89,6 +105,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/join-family" element={<JoinPage />} />
     </Routes>
   </BrowserRouter>
 );
