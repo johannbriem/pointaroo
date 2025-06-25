@@ -397,6 +397,7 @@ export default function Admin() {
       code,
       family_id: profile.family_id,
       expires_at,
+      role: "kid",
     });
 
     if (!error) setInviteCode(code);
@@ -754,12 +755,12 @@ export default function Admin() {
 
               {inviteCode && (
                 <div className="mt-4">
-                  <p className="text-gray-800 mb-2">Invite Link:</p>
+                  <p className="text-gray-800 mb-2 text-white">Invite Link:</p>
                   <div className="flex items-center space-x-2">
                     <input
                       type="text"
                       readOnly
-                      className="flex-1 p-2 border rounded text-black"
+                      className="flex-1 p-2 border rounded text-white bg-gray-800"
                       value={`${window.location.origin}/join-family?code=${inviteCode}`}
                     />
                     <button

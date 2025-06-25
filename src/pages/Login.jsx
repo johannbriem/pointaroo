@@ -25,7 +25,13 @@ export default function Login() {
     if (error) {
       alert("Login failed: " + error.message);
     } else {
-      navigate("/");
+      const redirectPath = sessionStorage.getItem('postLoginRedirect');
+      if (redirectPath) {
+        sessionStorage.removeItem('postLoginRedirect');
+        navigate(redirectPath);
+      } else {
+        navigate("/");
+      }
     }
   };
 
