@@ -51,7 +51,7 @@ export default function Admin() {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("role")
+          .select("role", "family_id")
           .eq("id", user.id)
           .single();
         setRole(profile?.role || null);
@@ -113,8 +113,8 @@ export default function Admin() {
         title: selectedTemplate.title,
         points: selectedTemplate.default_points,
         frequency: selectedTemplate.default_frequency,
-        max_per_day: 1, // A sensible default
-        photo_url: "", // No photo in template
+        max_per_day: 1,
+        photo_url: "",
       });
       setIsEditing(false);
       setEditingId(null);
@@ -130,7 +130,7 @@ export default function Admin() {
       alert("Error updating goal.");
     } else {
       alert("Goal updated!");
-      fetchKids(); // refresh to reflect changes
+      fetchKids();
     }
   };
 
@@ -183,13 +183,40 @@ export default function Admin() {
         fetchTasks();
       }
     } else {
-      const { error } = await supabase.from("tasks").insert([form]);
+      // Fetch user's family_id first
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("family_id")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError || !profile?.family_id) {
+        alert("You must be part of a family to create a task.");
+        return;
+      }
+
+      const { error } = await supabase.from("tasks").insert([
+        {
+          title: form.title,
+          points: form.points,
+          max_per_day: form.max_per_day,
+          photo_url: form.photo_url || null,
+          emoji: form.emoji || null,
+          family_id: profile.family_id,
+        }
+      ]);
+
       if (!error) {
         resetForm();
         fetchTasks();
+      } else {
+        console.error("Insert task error:", error);
+        alert("Failed to create task.");
       }
     }
   };
+
 
   const handleAddRewardChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -259,7 +286,6 @@ export default function Admin() {
       title: task.title,
       points: task.points,
       max_per_day: task.max_per_day,
-      frequency: task.frequency,
       photo_url: task.photo_url || "",
     });
     setIsEditing(true);
