@@ -39,7 +39,10 @@ export default function Admin() {
   const [historyFilter, setHistoryFilter] = useState('all');
   const { t } = useTranslation();
   const [templates, setTemplates] = useState([]);
-
+  const [familyMembers, setFamilyMembers] = useState([]);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
+  const [copySuccess, setCopySuccess] = useState("");
 
   useEffect(() => {
     const loadUserAndRole = async () => {
@@ -347,6 +350,29 @@ export default function Admin() {
     return acc;
   }, {});
 
+  const fetchFamilyMembers = async () => {
+    const { data: userProfile } = await supabase
+      .from("profiles")
+      .select("family_id")
+      .eq("id", user.id)
+      .single();
+
+    const { data: members } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("family_id", userProfile.family_id);
+
+    setFamilyMembers(members || []);
+  };
+
+  useEffect(() => {
+    if (activeTab === "family" && user) {
+      fetchFamilyMembers();
+    }
+    // eslint-disable-next-line
+  }, [activeTab, user]);
+
+
   const frequencyOrder = ['daily', 'weekly', 'once', 'other'];
   const sortedFrequencies = Object.keys(groupedTasks).sort((a, b) => {
     const indexA = frequencyOrder.indexOf(a);
@@ -355,6 +381,32 @@ export default function Admin() {
     if (indexB === -1) return -1;
     return indexA - indexB;
   });
+
+  const generateInvite = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("family_id")
+      .eq("id", user.id)
+      .single();
+
+    const code = crypto.randomUUID().slice(0, 8);
+    const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    const { error } = await supabase.from("invites").insert({
+      code,
+      family_id: profile.family_id,
+      expires_at,
+    });
+
+    if (!error) setInviteCode(code);
+    else alert("❌ Failed to create invite");
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/join-family?code=${inviteCode}`);
+    setCopySuccess("✅ Link copied!");
+  };
 
   if (!user) return <p className="text-center mt-10">Loading...</p>;
   if (role !== "admin") return <p className="text-red-500 text-center mt-10">❌ Admin access only</p>;
@@ -369,6 +421,7 @@ export default function Admin() {
           <button onClick={() => setActiveTab("bonus")}>🎁 {t("admin.bonusTab")}</button>
           <button onClick={() => setActiveTab("rewards")}>🎁 {t("admin.rewardsTab")}</button>
           <button onClick={() => setActiveTab("requests")}>✉️ {t("admin.requestsTab")} ({rewardRequests.filter(r => r.status === 'pending').length})</button>
+          <button onClick={() => setActiveTab("family")}>👨‍👩‍👧‍👦 Family</button>
         </div>
 
         {activeTab === "tasks" && (
@@ -687,99 +740,58 @@ export default function Admin() {
           </div>
         )}
 
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-2">👀 {t("admin.previewAsKid")}</h2>
+        {activeTab === "family" && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-2">🎯 {t("admin.editKidGoals")}</h2>
-            {kids.map((kid) => (
-              <div key={kid.id} className="bg-white border p-4 rounded shadow mb-4">
-                <h3 className="font-bold mb-2">{kid.display_name || kid.email}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder={t("admin.phoneModel")}
-                    className="border p-2 rounded"
-                    value={kid.goal?.phone_model || ""}
-                    onChange={(e) =>
-                      setKids((prev) =>
-                        prev.map((k) =>
-                          k.id === kid.id
-                            ? { ...k, goal: { ...k.goal, phone_model: e.target.value } }
-                            : k
-                        )
-                      )
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder={t("admin.totalCost")}
-                    className="border p-2 rounded"
-                    value={kid.goal?.total_cost || ""}
-                    onChange={(e) =>
-                      setKids((prev) =>
-                        prev.map((k) =>
-                          k.id === kid.id
-                            ? { ...k, goal: { ...k.goal, total_cost: e.target.value } }
-                            : k
-                        )
-                      )
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder={t("admin.parentPercent")}
-                    className="border p-2 rounded"
-                    value={kid.goal?.parent_percent || ""}
-                    onChange={(e) =>
-                      setKids((prev) =>
-                        prev.map((k) =>
-                          k.id === kid.id
-                            ? { ...k, goal: { ...k.goal, parent_percent: e.target.value } }
-                            : k
-                        )
-                      )
-                    }
-                  />
-                  <input
-                    type="text"
-                    placeholder={t("admin.imageUrl")}
-                    className="border p-2 rounded"
-                    value={kid.goal?.phone_image || ""}
-                    onChange={(e) =>
-                      setKids((prev) =>
-                        prev.map((k) =>
-                          k.id === kid.id
-                            ? { ...k, goal: { ...k.goal, phone_image: e.target.value } }
-                            : k
-                        )
-                      )
-                    }
-                  />
-                </div>
-                <button
-                  onClick={() => updateGoal(kid.id, kid.goal)}
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                  💾 {t("admin.saveGoal")}
-                </button>
-              </div>
-            ))}
-          </div>
-          <select
-            value={viewingKidId}
-            onChange={(e) => setViewingKidId(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md text-black"
-          >
-            <option value="">{t("admin.selectKidToPreview")}</option>
-            {kids.map((kid) => (
-              <option key={kid.id} value={kid.id}>
-                {kid.email}
-              </option>
-            ))}
-          </select>
-        </div>
+            <h2 className="text-xl font-semibold mb-4">👨‍👩‍👧‍👦 Manage Family Members</h2>
+            
+            <div className="mb-6">
+              <button
+                onClick={generateInvite}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+              >
+                ➕ Generate Family Invite
+              </button>
 
-        {viewingKidId && <KidPreview userId={viewingKidId} />}
+              {inviteCode && (
+                <div className="mt-4">
+                  <p className="text-gray-800 mb-2">Invite Link:</p>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      readOnly
+                      className="flex-1 p-2 border rounded text-black"
+                      value={`${window.location.origin}/join-family?code=${inviteCode}`}
+                    />
+                    <button
+                      onClick={copyToClipboard}
+                      className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1 rounded"
+                    >
+                      📋 Copy
+                    </button>
+                  </div>
+                  {copySuccess && <p className="text-green-600 mt-1">{copySuccess}</p>}
+                </div>
+              )}
+            </div>
+
+            <h3 className="text-lg font-semibold mb-2">Family Members</h3>
+            <ul className="space-y-2">
+              {familyMembers.map((member) => (
+                <li key={member.id} className="bg-gray-100 p-4 rounded shadow-sm text-black">
+                  <p className="font-bold">{member.display_name || member.email}</p>
+                  <p className="text-sm text-gray-600">Age: {member.age}</p>
+                  <p className="text-sm text-gray-600">Role: {member.role}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+
+        
+
+  
+        
       </div>
 
         {showBonusModal && (
