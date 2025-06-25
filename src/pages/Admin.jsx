@@ -38,6 +38,8 @@ export default function Admin() {
   const [editingRewardId, setEditingRewardId] = useState(null);
   const [historyFilter, setHistoryFilter] = useState('all');
   const { t } = useTranslation();
+  const [templates, setTemplates] = useState([]);
+
 
   useEffect(() => {
     const loadUserAndRole = async () => {
@@ -63,6 +65,7 @@ export default function Admin() {
       fetchTasks();
       fetchRewards();
       fetchRewardRequests();
+      fetchTemplates();
     }
   }, [user, role]);
 
@@ -73,6 +76,7 @@ export default function Admin() {
       .eq("role", "kid");
 
     if (!profiles) return;
+
 
     const userIds = profiles.map((p) => p.id);
     const { data: goalsData } = await supabase
@@ -86,6 +90,32 @@ export default function Admin() {
     }));
 
     setKids(merged);
+  };
+
+  const fetchTemplates = async () => {
+    const { data } = await supabase.from("chore_templates").select("*").order("title");
+    setTemplates(data || []);
+  };
+
+  const handleTemplateSelection = (e) => {
+    const templateId = e.target.value;
+    if (!templateId) {
+      resetForm();
+      return;
+    }
+
+    const selectedTemplate = templates.find(t => t.id.toString() === templateId);
+    if (selectedTemplate) {
+      setForm({
+        title: selectedTemplate.title,
+        points: selectedTemplate.default_points,
+        frequency: selectedTemplate.default_frequency,
+        max_per_day: 1, // A sensible default
+        photo_url: "", // No photo in template
+      });
+      setIsEditing(false);
+      setEditingId(null);
+    }
   };
 
   const updateGoal = async (kidId, updatedGoal) => {
@@ -348,6 +378,26 @@ export default function Admin() {
                 {isEditing ? `✏️ ${t("common.edit")} ${t("tasks.title")}` : `➕ ${t("common.add")} ${t("tasks.title")}`}
               </h2>
 
+              {!isEditing && (
+                <div>
+                  <label htmlFor="template-select" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t("admin.startWithTemplate", "Start with a template (optional)")}
+                  </label>
+                  <select
+                    id="template-select"
+                    onChange={handleTemplateSelection}
+                    className="w-full p-3 border border-gray-300 rounded-md text-black"
+                  >
+                    <option value="">-- {t("admin.createCustomTask", "Create a new custom task")} --</option>
+                    {templates.map((template) => (
+                      <option key={template.id} value={template.id}>
+                        {template.title} ({t("admin.age", "Age")}: {template.age_group}, {template.default_points} {t("tasks.points")})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <input
                 type="text"
                 name="title"
@@ -526,6 +576,7 @@ export default function Admin() {
                     )}
                   </div>
                 </form>
+
               )}
             </div>
             <h3 className="text-lg font-semibold mb-2">{t("admin.currentRewards")}</h3>
@@ -618,7 +669,7 @@ export default function Admin() {
                         <p className="text-sm text-gray-600">
                           {t("common.status")}: <span className={`font-semibold ${request.status === 'pending' ? 'text-yellow-600' : request.status === 'approved' ? 'text-green-600' : 'text-red-600'}`}>{request.status.charAt(0).toUpperCase() + request.status.slice(1)}</span>
                         </p>
-                <p className="text-xs text-gray-500">{t("common.requestedBy")}: {new Date(request.requested_at).toLocaleDateString()}</p>
+                <p className="text-xs text-gray-500">{t("common.on")}: {new Date(request.requested_at).toLocaleDateString()}</p>
                         {request.approved_at && (
                           <p className="text-xs text-gray-500">
                             {t("common.processed")}: {new Date(request.approved_at).toLocaleString()} {t("common.by")} {request.admin?.display_name || request.admin?.email || t("common.unknownAdmin")}
