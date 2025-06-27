@@ -1,8 +1,8 @@
 {
   "common": {
-    "submit": "Senda",
-    "cancel": "Hætta við",
-    "yes": "Já",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "yes": "Yes",
     "no": "Nei",
     "saveChanges": "Vista breytingar",
     "add": "Bæta við",
@@ -118,7 +118,7 @@
     "forgotPassword": "Gleymt lykilorð?",
     "noAccount": "Ertu ekki með aðgang?",
     "signup": "Nýskráning"
-},
+  },
   "signupPage": {
     "title": "Nýskráning",
     "savingFor": "Hvað ertu að safna fyrir?",
@@ -136,12 +136,28 @@
     "admin": "Stjórnborð",
     "myGoal": "Markmið mitt",
     "installApp": "Setja upp forrit",
-    "logout": "Útskrá"
+    "logout": "Útskrá",
+    "menu": "Valmynd",
+    "themeMode": "Þema stilling",
+    "lightMode": "Ljós stilling",
+    "darkMode": "Dökk stilling",
+    "systemMode": "Kerfisstilling"
   },
   "taskModal": {
     "beforePhoto": "📸 Fyrir mynd",
     "afterPhoto": "📸 Eftir mynd",
     "confirmCompletion": "Staðfesta lokun",
     "saving": "Vista..."
+  },
+  "landing": {
+    "subtitle": "A fun way for kids to earn their phone and build healthy habits.",
+    "howTitle": "How it works",
+    "setGoal": "Set a goal",
+    "setGoalText": "Pick a phone model and let kids know what they’re working toward.",
+    "completeTasks": "Complete tasks",
+    "completeTasksText": "Kids upload before/after photos to earn points for chores.",
+    "redeemRewards": "Earn rewards",
+    "redeemRewardsText": "Track progress, unlock rewards, and reach their goal!",
+    "ready": "Ready to start your Pointaroo journey?"
   }
 }

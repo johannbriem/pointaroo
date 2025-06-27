@@ -9,7 +9,7 @@ export default function Layout() {
   const [user, setUser] = useState(null);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { theme, uiMode } = useTheme();
+  const { theme, uiMode } = useTheme(); // Get both theme and uiMode
 
   useEffect(() => {
     const loadUser = async () => {
@@ -30,9 +30,23 @@ export default function Layout() {
     };
   }, []);
 
+  // Apply theme and uiMode to the body element
+  useEffect(() => {
+    console.log("Layout useEffect - uiMode:", uiMode, "theme:", theme);
+    // Set data-theme based on uiMode (kid or parent)
+    document.body.setAttribute('data-theme', uiMode === "kid" ? "kids" : "modern");
+    // Apply the specific theme class if in kid mode
+    if (uiMode === "kid") {
+      document.body.classList.add(`theme-${theme}`);
+    } else {
+      // Remove any previous theme classes if switching to parent mode
+      document.body.className = document.body.className.replace(/theme-\w+/g, '');
+    }
+  }, [uiMode, theme]); // Depend on both uiMode and theme
+
   return (
-    <div className={`min-h-screen ${uiMode === "kid" ? `theme-${theme}` : "parent-mode"}`}>
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+    // Remove the outer div with theme classes, let body handle it
+    <div className="min-h-screen flex flex-col"> {/* Keep a wrapper div if needed for layout, but remove theme classes */}
       {user && <Navbar openGoalModal={() => setShowGoalModal(true)} />}
 
       {showGoalModal && user && (
@@ -44,7 +58,6 @@ export default function Layout() {
           <Outlet context={{ user, loading }} />
         </div>
       </main>
-    </div>
     </div>
   );
 }

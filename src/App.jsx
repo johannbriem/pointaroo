@@ -19,6 +19,7 @@ function App() {
   const [rewards, setRewards] = useState([]);
   const [showGoalModal, setShowGoalModal] = useState(false);
 
+  console.log("App component rendered"); // Diagnostic log
 
   const fetchPurchases = async () => {
     const { data } = await supabase
@@ -34,6 +35,7 @@ function App() {
   };
 
   useEffect(() => {
+    console.log("App useEffect [user] fired"); // Diagnostic log
     if (user) {
       fetchTasks();
       fetchCompletions();
@@ -43,7 +45,7 @@ function App() {
   }, [user]);
 
   useEffect(() => {
-    console.log("Tasks loaded:", tasks);
+    console.log("Tasks loaded:", tasks); // Diagnostic log
   }, [tasks]);
 
   // Calculate points:
@@ -61,6 +63,7 @@ function App() {
 
 
   useEffect(() => {
+    console.log("App useEffect [loadUserAndProfile] fired"); // Diagnostic log
     const loadUserAndProfile = async () => {
       const {
         data: { user },
@@ -83,6 +86,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    console.log("App useEffect [user, fetchGoal, fetchTasks, fetchCompletions] fired"); // Diagnostic log
     if (user) {
       fetchTasks();
       fetchCompletions();
@@ -97,17 +101,17 @@ function App() {
       .eq("user_id", user.id)
       .limit(1);
 
-  if (!error && data.length > 0) {
-    setGoal(data[0]);
-  }    
-};
+    if (!error && data.length > 0) {
+      setGoal(data[0]);
+    }
+  };
 
   const fetchTasks = async () => {
     const { data, error } = await supabase
       .from("tasks")
       .select("*");
-      // Assuming tasks are global and not user-specific.
-      // If tasks are meant to be user-specific, the admin panel needs to assign user_ids.
+    // Assuming tasks are global and not user-specific.
+    // If tasks are meant to be user-specific, the admin panel needs to assign user_ids.
     if (!error) setTasks(data);
   };
 
@@ -128,7 +132,6 @@ function App() {
       .from("task_completions")
       .select("*", { count: "exact" })
       .eq("user_id", user.id)
-      .eq("task_id", task.id)
       .gte("completed_at", startOfDay(new Date()).toISOString())
       .lte("completed_at", endOfDay(new Date()).toISOString());
 

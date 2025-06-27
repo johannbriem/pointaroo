@@ -162,22 +162,7 @@ export default function Home() {
         <img src="/logo.png" alt={t("app.title")} className="h-12" />
       </div>
 
-      {uiMode === "kid" && (
-        <div className="flex justify-center gap-2 mb-4">
-          {["space", "jungle", "robot", "ocean"].map((t) => (
-            <button
-              key={t}
-              onClick={() => setTheme(t)}
-              className={`px-3 py-1 rounded-full text-sm font-bold border ${theme === t ? "bg-blue-500 text-white" : "bg-white text-gray-700"} hover:bg-blue-100 transition`}
-            >
-              {t === "space" && "🪐 Space"}
-              {t === "jungle" && "🐸 Jungle"}
-              {t === "robot" && "🤖 Robot"}
-              {t === "ocean" && "🐠 Ocean"}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Removed theme selector buttons from here */}
 
       <div className="max-w-4xl mx-auto px-4">
         {goal ? (
