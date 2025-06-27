@@ -20,7 +20,6 @@ export default function Home() {
   const [goal, setGoal] = useState(null);
   const [purchases, setPurchases] = useState([]);
   const [rewards, setRewards] = useState([]);
-
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { theme, uiMode, setTheme, setUiMode } = useTheme();
@@ -30,29 +29,48 @@ export default function Home() {
   }, [t]);
 
   useEffect(() => {
-    localStorage.setItem("uiMode", uiMode);
-    localStorage.setItem("theme", theme);
-  }, [uiMode, theme]);
-
-  useEffect(() => {
     if (user) {
-      const role = user.user_metadata?.role || null;
-      setRole(role);
-      if (!localStorage.getItem("uiMode")) {
-        setUiMode(role === "admin" ? "parent" : "kid");
-      }
+      const detectedRole = user.user_metadata?.role || null;
+      setRole(detectedRole);
+
+      const storedUiMode = localStorage.getItem("uiMode");
+      const storedTheme = localStorage.getItem("theme");
+
+      if (!storedUiMode) setUiMode(detectedRole === "admin" ? "parent" : "kid");
+      if (!storedTheme) setTheme("space");
+    } else {
+      setRole(null);
     }
   }, [user]);
 
   useEffect(() => {
-    if (!user || loading) return;
-    fetchTasks();
-    fetchCompletionsToday();
-    fetchAllCompletions();
-    fetchRewardRequests();
-    fetchGoal();
-    fetchPurchases();
-    fetchRewards();
+    localStorage.setItem("uiMode", uiMode);
+  }, [uiMode]);
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (user) {
+      fetchTasks();
+      fetchCompletionsToday();
+      fetchAllCompletions();
+      fetchRewardRequests();
+      fetchGoal();
+      fetchPurchases();
+      fetchRewards();
+    } else {
+      setTasks([]);
+      setCompletionsToday([]);
+      setAllCompletions([]);
+      setRewardRequests([]);
+      setGoal(null);
+      setPurchases([]);
+      setRewards([]);
+    }
   }, [user?.id, loading]);
 
   const fetchTasks = async () => {
@@ -120,38 +138,37 @@ export default function Home() {
     return sum + (parseInt(task?.points) || 0);
   }, 0);
 
-  const purchasedPoints = purchases.reduce((sum, p) => sum + (parseInt(p.cost) || 0), 0);
-
-  const pendingRequestedPoints = rewardRequests.reduce((sum, req) => {
-    return req.status === "pending" ? sum + (parseInt(req.points_deducted) || 0) : sum;
+  const purchasedPoints = purchases.reduce((sum, p) => {
+    return sum + (parseInt(p.cost) || 0);
   }, 0);
 
-  const availablePoints = earnedPoints - purchasedPoints - pendingRequestedPoints;
+  const pendingRequestedPoints = rewardRequests.reduce((sum, req) => {
+    if (req.status === 'pending') {
+      return sum + (parseInt(req.points_deducted) || 0);
+    }
+    return sum;
+  }, 0);
+
+  const spentPoints = purchasedPoints + pendingRequestedPoints;
+  const availablePoints = earnedPoints - spentPoints;
 
   if (loading) return <p className="text-center mt-10 text-gray-500">Loading...</p>;
   if (!user) return <LandingPage />;
-  if (role === "admin") return <p className="text-center mt-10">{t("app.redirectingAdmin")}</p>;
+  if (role === "admin") return <p className="text-center mt-10 text-gray-500">{t("app.redirectingAdmin")}</p>;
 
   return (
-    <div
-      className={`max-w-6xl mx-auto p-4 sm:p-6 ${
-        uiMode === "kid" ? `theme-${theme}` : "parent-mode"
-      }`}
-    >
+    <div className={`max-w-6xl mx-auto p-4 sm:p-6 text-center ${uiMode === "kid" ? `theme-${theme}` : "parent-mode"}`}>
       <div className="flex justify-center mb-4">
         <img src="/logo.png" alt={t("app.title")} className="h-12" />
       </div>
 
-      {/* Kid Mode: Theme Picker */}
       {uiMode === "kid" && (
-        <div className="flex justify-center gap-2 mb-6">
+        <div className="flex justify-center gap-2 mb-4">
           {["space", "jungle", "robot", "ocean"].map((t) => (
             <button
               key={t}
               onClick={() => setTheme(t)}
-              className={`px-3 py-1 rounded-full text-sm font-bold border 
-                ${theme === t ? "bg-blue-500 text-white" : "bg-white text-gray-700"}
-                hover:bg-blue-100 transition`}
+              className={`px-3 py-1 rounded-full text-sm font-bold border ${theme === t ? "bg-blue-500 text-white" : "bg-white text-gray-700"} hover:bg-blue-100 transition`}
             >
               {t === "space" && "🪐 Space"}
               {t === "jungle" && "🐸 Jungle"}
@@ -162,63 +179,45 @@ export default function Home() {
         </div>
       )}
 
-      {/* Goal and Progress */}
-      <div className="max-w-4xl mx-auto">
-              <div className="mb-6 p-4 bg-white/80 rounded-3xl shadow-xl text-left md:flex md:items-center md:gap-6 border-4 border-blue-200">
-                {goal.phone_image && (
-                  <img
-                    src={goal.phone_image}
-                    alt={goal.phone_model}
-                    className="w-full rounded-xl md:w-1/3 lg:w-1/4 h-40 object-contain mb-4 md:mb-0"
-                  />
-                )}
-                <div className="flex-1">
-                  <h2 className="text-2xl font-extrabold mb-2 text-blue-800">
-                    🎯 {t("home.goal")}: {goal.phone_model}
-                  </h2>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-blue-700">
-                    <p><span className="font-semibold">{t("home.totalCost")}:</span> ${goal.total_cost}</p>
-                    <p><span className="font-semibold">{t("home.parentPays")}:</span> {goal.parent_percent}%</p>
-                    <p className="col-span-2 text-base font-bold text-green-700">
-                      {t("home.yourGoal")}: ${Math.ceil(goal.total_cost * (1 - goal.parent_percent / 100))}
-                    </p>
-                  </div>
-                </div>
+      <div className="max-w-4xl mx-auto px-4">
+        {goal ? (
+          <div className="rounded-3xl p-6 mb-6 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg flex flex-col md:flex-row items-center gap-6">
+            {goal.phone_image && (
+              <img src={goal.phone_image} alt={goal.phone_model} className="w-28 h-28 object-contain rounded-xl bg-white p-2" />
+            )}
+            <div className="text-left space-y-2 w-full">
+              <h3 className="text-lg md:text-xl font-bold">🎯 {t("home.goal")}: {goal.phone_model}</h3>
+              <div className="flex gap-4 text-sm md:text-base">
+                <span className="bg-yellow-300 text-black px-3 py-1 rounded-full font-semibold">{t("home.yourGoal")}: ${childGoal}</span>
+                <span className="bg-white/30 px-3 py-1 rounded-full font-semibold">{t("home.parentPays")}: {goal.parent_percent}%</span>
               </div>
-
-            <div className="w-full bg-gray-300 h-5 rounded-full overflow-hidden mb-6">
-              <div
-                className="bg-gradient-to-r from-yellow-400 to-green-400 h-full text-xs text-white text-center font-bold"
-                style={{ width: `${Math.min((availablePoints / childGoal) * 100, 100)}%` }}
-              >
-                {/* Progress Bar + Points Display */}
-                <div className="mb-6">
-                  <div className="w-full bg-gray-300 h-6 rounded-full overflow-hidden shadow-inner">
-                    <div className="bg-gradient-to-r from-yellow-400 to-green-400 h-full text-xs text-white text-center font-bold transition-all duration-300"
-                      style={{ width: `${Math.min((availablePoints / childGoal) * 100, 100)}%` }}>
-                      <span className="sr-only">{availablePoints} / {childGoal}</span>
-                    </div>
-                  </div>
-                  <p className="text-lg font-extrabold mt-2 text-white drop-shadow text-center">
-                    {availablePoints} / {childGoal} points
-                  </p>
+              <p className="text-white text-sm italic">{t("home.motivation")}</p>
+              <div className="relative w-full bg-white/30 h-6 rounded-full overflow-hidden mt-3">
+                <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-yellow-400 to-green-500 text-white text-sm font-bold flex items-center justify-center transition-all" style={{ width: `${Math.min((availablePoints / childGoal) * 100, 100)}%` }}>
+                  {availablePoints} / {childGoal} {t("tasks.points")}
                 </div>
               </div>
             </div>
-          
+          </div>
+        ) : (
+          <div className="mb-6 p-4 rounded-lg bg-blue-50 text-center">
+            <h2 className="text-xl font-bold text-blue-800 mb-2">{t("app.yourCurrentPoints")}</h2>
+            <p className="text-4xl font-extrabold text-blue-900">{availablePoints} {t("tasks.points")}</p>
+            <p className="text-sm text-blue-700 mt-2">{t("app.setGoalAdmin")}</p>
+          </div>
+        )}
 
+        <div className="max-w-4xl mx-auto px-4">
+          <TaskList
+            tasks={tasks}
+            onComplete={handleTaskSuccessfullyCompleted}
+            completionsToday={completionsToday}
+            userId={user.id}
+            theme={theme}
+            uiMode={uiMode}
+          />
+        </div>
       </div>
-
-      {/* Task List */}
-      <TaskList
-        tasks={tasks}
-        onComplete={handleTaskSuccessfullyCompleted}
-        completionsToday={completionsToday}
-        userId={user.id}
-        theme={theme}
-        uiMode={uiMode}
-      />
     </div>
   );
 }
-  
