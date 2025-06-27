@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -67,3 +69,218 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* tailwind or global.css */
+.theme-space {
+  background: linear-gradient(to bottom, #0d1b2a, #1b263b); /* Deep space blue */
+  color: white;
+  min-height: 100vh;
+  background-image: url('/space-bg.svg'); /* Optional: star/cloud pattern */
+  background-size: cover;
+  background-position: center;
+}
+
+.theme-space .goal-box {
+  background: linear-gradient(to bottom right, #1b263b, #415a77);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+.theme-space .task-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-space .task-card h3 {
+  color: #fff;
+}
+
+.theme-space .complete-button {
+  background-color: #00e676;
+  color: #1b263b;
+  font-weight: bold;
+  border-radius: 9999px;
+}
+
+.theme-space .progress-bar {
+  background: linear-gradient(to right, #fdd835, #00e676);
+  border-radius: 9999px;
+  height: 1rem;
+  overflow: hidden;
+}
+.theme-space .progress-bar-inner {
+  background-color: #1b263b;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.theme-jungle {
+  background: linear-gradient(to bottom, #14532d, #166534); /* dark jungle green */
+  color: white;
+  min-height: 100vh;
+  background-image: url('/jungle-bg.svg'); /* optional */
+  background-size: cover;
+  background-position: center;
+}
+
+.theme-jungle .goal-box {
+  background: linear-gradient(to bottom right, #166534, #22c55e);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  color: white;
+}
+
+.theme-jungle .task-card {
+  background-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
+  border-radius: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-jungle .complete-button {
+  background-color: #bbf7d0;
+  color: #14532d;
+  font-weight: bold;
+  border-radius: 9999px;
+}
+
+.theme-jungle .progress-bar {
+  background: linear-gradient(to right, #bef264, #4ade80);
+  border-radius: 9999px;
+  height: 1rem;
+  overflow: hidden;
+}
+.theme-jungle .progress-bar-inner {
+  background-color: #14532d;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+
+.theme-robot {
+  background: linear-gradient(to bottom, #0f0f0f, #2a2a2a);
+  color: #00e5ff;
+  min-height: 100vh;
+}
+
+.theme-robot .goal-box {
+  background: linear-gradient(to bottom right, #005377, #4b4b4b);
+  border-radius: 1rem;
+  font-family: 'Roboto', sans-serif;
+  padding: 1.25rem;
+  color: #00e5ff;
+}
+
+.theme-robot .task-card {
+  background-color: #005377;
+  color: #00e5ff;
+  backdrop-filter: blur(4px);
+  border: 2px solid #00e5ff;
+  border-radius: 1rem;
+}
+
+.theme-robot .complete-button {
+  background-color: #00e5ff;
+  color: #0f0f0f;
+  font-weight: bold;
+  border-radius: 9999px;
+}
+
+.theme-robot .progress-bar {
+  background: linear-gradient(to right, #00e5ff, #00ff95);
+  border-radius: 9999px;
+  height: 1rem;
+  overflow: hidden;
+}
+.theme-robot .progress-bar-inner {
+  background-color: #0f0f0f;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.theme-ocean {
+  background: linear-gradient(to bottom, #005377, #00aaff);
+  color: white;
+  min-height: 100vh;
+}
+
+.theme-ocean .goal-box {
+  background: linear-gradient(to bottom right, #0077b6, #90e0ef);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  color: white;
+}
+
+.theme-ocean .task-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-ocean .complete-button {
+  background-color: #90e0ef;
+  color: #0077b6;
+  font-weight: bold;
+  border-radius: 9999px;
+}
+
+.theme-ocean .progress-bar {
+  background: linear-gradient(to right, #ade8f4, #48cae4);
+  border-radius: 9999px;
+  height: 1rem;
+  overflow: hidden;
+}
+.theme-ocean .progress-bar-inner {
+  background-color: #0077b6;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+.kid-card {
+  border-radius: 1.5rem;
+  background: #fff8dc;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  padding: 1rem;
+  border: 3px solid #ffd700;
+}
+
+.kid-card .complete-button {
+  background-color: #4ade80;
+  color: white;
+  font-weight: bold;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 1rem;
+}
+.kid-mode .progress-bar {
+  background: linear-gradient(to right, #facc15, #4ade80);
+  height: 1.25rem;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.kid-mode .progress-bar-inner {
+  background-color: white;
+  transition: width 0.3s ease;
+  border-radius: 9999px;
+}
+.kid-mode .task-card::before {
+  content: "⭐";
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+.kid-mode .task-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  border-radius: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem;
+}
+.kid-mode * {
+  font-family: 'Comic Neue', cursive;
+}
+
+

@@ -3,11 +3,13 @@ import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 import GoalModal from "./components/GoalModal";
+import { useTheme} from "./components/ThemeContext";
 
 export default function Layout() {
   const [user, setUser] = useState(null);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { theme, uiMode } = useTheme();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -29,6 +31,7 @@ export default function Layout() {
   }, []);
 
   return (
+    <div className={`min-h-screen ${uiMode === "kid" ? `theme-${theme}` : "parent-mode"}`}>
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {user && <Navbar openGoalModal={() => setShowGoalModal(true)} />}
 
@@ -41,6 +44,7 @@ export default function Layout() {
           <Outlet context={{ user, loading }} />
         </div>
       </main>
+    </div>
     </div>
   );
 }
