@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { XMarkIcon, Bars3Icon, Bars3BottomRightIcon } from "@heroicons/react/24/solid";
 import LanguageSelector from "./LanguageSelector";
@@ -17,9 +17,9 @@ export default function Navbar({ openGoalModal }) {
   const [userDisplayName, setUserDisplayName] = useState("User");
   const { t } = useTranslation();
   const { uiMode, theme, setTheme} = useTheme();
-  //const { emoji, mascot, name: themeName } = useThemeMeta(theme);
-
-
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef(null);
   const [darkModePreference, setDarkModePreference] = useState(() => {
     const savedPreference = localStorage.getItem('theme-mode');
     if (savedPreference) return savedPreference;
@@ -37,6 +37,46 @@ export default function Navbar({ openGoalModal }) {
           .eq("id", user.id)
           .single();
 
+        if (profile?.role === 'admin') {
+          const [goalNotifs, rewardRequests] = await Promise.all([
+            supabase
+              .from("goal_notifications")
+              .select("*")
+              .order("created_at", { ascending: false }),
+            supabase
+              .from("reward_requests")
+              .select("id, requested_at, status, rewards(name)")
+              .eq("status", "pending")
+              .order("requested_at", { ascending: false }),
+          ]);
+
+          const combinedNotifications = [];
+
+          if (goalNotifs.data) {
+            goalNotifs.data.forEach((n) => {
+              combinedNotifications.push({
+                id: `goal-${n.id}`,
+                type: "goal_completed",
+                message: n.message,
+                created_at: n.created_at,
+              });
+            });
+          }
+
+          if (rewardRequests.data) {
+            rewardRequests.data.forEach((r) => {
+              combinedNotifications.push({
+                id: `reward-${r.id}`,
+                type: "reward_request",
+                message: `Reward requested: ${r.rewards?.name || "unknown"}`,
+                created_at: r.requested_at,
+              });
+            });
+          }
+
+          setNotifications(combinedNotifications);
+        }
+
         if (error) {
           console.error("Error fetching profile:", error);
           setIsAdmin(false);
@@ -47,6 +87,7 @@ export default function Navbar({ openGoalModal }) {
       }
     };
     loadUserAndRole();
+
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
@@ -100,6 +141,19 @@ export default function Navbar({ openGoalModal }) {
     localStorage.setItem('theme-mode', darkModePreference);
   }, [darkModePreference]);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
@@ -131,6 +185,63 @@ export default function Navbar({ openGoalModal }) {
           <Link to="/completions" className="nav-link-desktop">
             {t("navbar.completions")}
           </Link>
+          {isAdmin && (
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-2 rounded hover:bg-[var(--color-navbar-hover-bg)]"
+            >
+              <span className="text-2xl">🔔</span>
+              {notifications.length > 0 && (
+                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+              )}
+            </button>
+          )}
+          {showNotifications && isAdmin && (
+            <div ref={notificationRef} className="absolute right-4 mt-2 w-80 ...">
+              <div className="absolute right-4 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 text-sm">
+                <h3 className="font-bold mb-2 text-gray-800">🔔 {t("navbar.notifications")}</h3>
+                {notifications.length === 0 ? (
+                  <p className="text-gray-500">{t("navbar.noNotifications")}</p>
+                ) : (
+                  <ul className="space-y-3">
+                    {notifications.map((n) => (
+                      <li key={n.id} className="border-b pb-2">
+                        <p className="text-gray-800">{n.message}</p>
+                        <div className="flex justify-end gap-2 mt-1">
+                          {n.type === "reward_request" ? (
+                            <Link
+                              to="/admin?tab=requests"
+                              className="text-sm text-blue-600 font-semibold hover:underline"
+                              onClick={() => setShowNotifications(false)}
+                            >
+                              {t("navbar.review")}
+                            </Link>
+                          ) : n.type === "goal_completed" ? (
+                            <Link
+                              to="/admin?tab=goals"
+                              className="text-sm text-green-600 font-semibold hover:underline"
+                              onClick={() => setShowNotifications(false)}
+                            >
+                              {t("navbar.viewGoal")}
+                            </Link>
+                          ) : null}
+                          <button
+                            onClick={async () => {
+                              await supabase.from("notifications").update({ read: true }).eq("id", n.id);
+                              setNotifications(notifications.filter(notif => notif.id !== n.id));
+                            }}
+                            className="text-xs text-gray-500 hover:text-gray-800"
+                          >
+                            {t("navbar.dismiss")}
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          )}
           <button
             onClick={() => setShowMenu(!showMenu)}
             className="text-[var(--color-navbar-text)] p-2 rounded-md hover:bg-[var(--color-navbar-hover-bg)] transition-colors flex items-center gap-2"

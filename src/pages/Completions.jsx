@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { useOutletContext } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
-// ...top imports remain the same
+import "../i18n";
 
 export default function Completions() {
   const { user, loading } = useOutletContext();

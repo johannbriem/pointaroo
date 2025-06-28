@@ -21,8 +21,6 @@ function App() {
   const [rewards, setRewards] = useState([]);
   const [showGoalModal, setShowGoalModal] = useState(false);
 
-  console.log("App component rendered"); // Diagnostic log
-
   const fetchPurchases = async () => {
     const { data } = await supabase
       .from("purchases")
@@ -37,7 +35,6 @@ function App() {
   };
 
   useEffect(() => {
-    console.log("App useEffect [user] fired"); // Diagnostic log
     if (user) {
       fetchTasks();
       fetchCompletions();
@@ -47,10 +44,8 @@ function App() {
   }, [user]);
 
   useEffect(() => {
-    console.log("Tasks loaded:", tasks); // Diagnostic log
   }, [tasks]);
 
-  // Calculate points:
   const earnedPoints = completionsToday.reduce((sum, comp) => {
     const task = tasks.find((t) => t.id === comp.task_id);
     return task ? sum + task.points : sum;
@@ -65,7 +60,6 @@ function App() {
 
 
   useEffect(() => {
-    console.log("App useEffect [loadUserAndProfile] fired"); // Diagnostic log
     const loadUserAndProfile = async () => {
       const {
         data: { user },
@@ -80,7 +74,6 @@ function App() {
           .eq("id", user.id)
           .single();
 
-        // userRole removed as it was unused
       }
     };
 
@@ -88,7 +81,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    console.log("App useEffect [user, fetchGoal, fetchTasks, fetchCompletions] fired"); // Diagnostic log
     if (user) {
       fetchTasks();
       fetchCompletions();
@@ -112,8 +104,6 @@ function App() {
     const { data, error } = await supabase
       .from("tasks")
       .select("*");
-    // Assuming tasks are global and not user-specific.
-    // If tasks are meant to be user-specific, the admin panel needs to assign user_ids.
     if (!error) setTasks(data);
   };
 
@@ -129,7 +119,6 @@ function App() {
   };
 
   const handleComplete = async (task) => {
-    // 1. Check today's completions
     const { data: completions } = await supabase
       .from("task_completions")
       .select("*", { count: "exact" })
@@ -144,7 +133,6 @@ function App() {
       return;
     }
 
-    // 2. Mark the task as completed (record it)
     const { error: insertError } = await supabase.from("task_completions").insert([
       {
         user_id: user.id,
@@ -170,7 +158,6 @@ function App() {
   }
   if (totalPoints >= childGoal) {
     alert("Congratulations! You've reached your goal!");
-    // Here you could trigger a reward or notification
   }
 
   if (!user) return <Auth onLogin={setUser} />;

@@ -32,13 +32,13 @@ export default function Store() {
   const [purchases, setPurchases] = useState([]);
   const [rewardRequests, setRewardRequests] = useState([]);
   const [rewards, setRewards] = useState([]);
-  const [_, forceUpdate] = useState(Date.now()); // For live countdown
+  const [_, forceUpdate] = useState(Date.now());
   const { t } = useTranslation();
 
   useEffect(() => {
     const interval = setInterval(() => {
       forceUpdate(Date.now());
-    }, 1000); // live update every second
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -107,7 +107,6 @@ export default function Store() {
       };
     }
 
-    // Include both reward_requests and purchases
     const relevantRequestTimestamps = rewardRequests
       .filter(
         req =>

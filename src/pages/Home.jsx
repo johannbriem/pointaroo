@@ -22,7 +22,6 @@ export default function Home() {
   const [purchases, setPurchases] = useState([]);
   const [rewards, setRewards] = useState([]);
   const { t } = useTranslation();
-  // const navigate = useNavigate();
   const { theme, uiMode, setTheme, setUiMode } = useTheme();
   const { emoji, name, mascot } = useThemeMeta(theme);
 
@@ -133,6 +132,32 @@ export default function Home() {
     alert(`Task "${task.title}" completed! You earned ${task.points} points.`);
   };
 
+  const handleGoalComplete = async () => {
+    await supabase.from("goal_notifications").insert([
+      {
+        user_id: user.id,
+        goal_id: goal.id,
+        message: `${user.email || user.id} completed their goal: ${goal.phone_model}`,
+      },
+    ]);
+
+    await supabase.from("notifications").insert([
+      {
+        user_id: user.id,
+        type: "goal_completed",
+        message: `${user.email || "A user"} completed their goal: ${goal.phone_model}`,
+        link: "/admin?tab=goals",
+        read: false,
+      },
+    ]);
+
+    // Remove goal from table
+    await supabase.from("goals").delete().eq("id", goal.id);
+    setGoal(null);
+
+    alert("🎉 Goal completed! Parent has been notified.");
+  };
+
   const childGoal = goal ? Math.ceil(goal.total_cost * (1 - goal.parent_percent / 100)) : GOAL;
 
   const earnedPoints = allCompletions.reduce((sum, comp) => {
@@ -158,8 +183,6 @@ export default function Home() {
   if (!user) return <LandingPage />;
   if (role === "admin") return <p className="text-center mt-10 text-gray-500">{t("app.redirectingAdmin")}</p>;
 
-  console.log("Home component rendered"); // Diagnostic log
-
   return (
     <div className={`max-w-6xl mx-auto p-4 sm:p-6 text-center ${uiMode === "kid" ? `theme-${theme}` : "parent-mode"}`}>
       <div className="flex justify-center mb-4">
@@ -170,9 +193,6 @@ export default function Home() {
         {emoji} Welcome to {name} World!
       </h1>
       <p className="text-sm text-[var(--color-text-secondary)]">Say hi to {mascot} 👋</p>
-
-
-      {/* Removed theme selector buttons from here */}
 
       <div className="max-w-4xl mx-auto px-4">
         {goal ? (
@@ -187,7 +207,11 @@ export default function Home() {
                 <span className="bg-white/30 px-3 py-1 rounded-full font-semibold">{t("home.parentPays")}: {goal.parent_percent}%</span>
               </div>
               <p className="text-white text-sm italic">{t("home.motivation")}</p>
-              <ProgressBar total={availablePoints} goal={childGoal} />
+              <ProgressBar
+                total={availablePoints}
+                goal={childGoal}
+                onGoalReached={handleGoalComplete}
+              />
             </div>
           </div>
         ) : (

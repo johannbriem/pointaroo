@@ -7,9 +7,9 @@
   --font-primary: 'Baloo 2', 'Fredoka', system-ui, sans-serif;
   --font-secondary: 'Comic Sans MS', 'Fredoka', cursive, sans-serif;
 
-  --color-bg-muted: rgba(255, 255, 255, 0.15); /* fallback muted background */
+  --color-bg-muted: rgba(255, 255, 255, 0.15);
   --color-border: #cccccc;
-  --color-primary: #22c55e; /* override per theme */
+  --color-primary: #22c55e;
   --color-text: #ffffff;
 
   --spacing-sm: 0.5rem;

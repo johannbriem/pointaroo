@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 
-export default function ProgressBar({ total, goal }) {
+export default function ProgressBar({ total, goal, onGoalReached }) {
   const percent = Math.min((total / goal) * 100, 100);
   const confettiFired = useRef(false);
 
@@ -9,19 +9,22 @@ export default function ProgressBar({ total, goal }) {
     if (percent >= 100 && !confettiFired.current) {
       confettiFired.current = true;
 
-      // Trigger confetti burst
+      // 1. Confetti animation
       confetti({
         particleCount: 150,
-        spread: 80,
+        spread: 70,
         origin: { y: 0.6 },
       });
 
-      // Optional: reset so it can happen again after page reload
+      // 2. Notify parent logic
+      onGoalReached?.();
+
+      // 3. Reset guard after some time
       setTimeout(() => {
         confettiFired.current = false;
-      }, 8000); // 8 seconds cooldown
+      }, 10000);
     }
-  }, [percent]);
+  }, [percent, onGoalReached]);
 
   return (
     <div className="my-6">

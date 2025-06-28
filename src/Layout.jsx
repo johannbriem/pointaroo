@@ -9,7 +9,7 @@ export default function Layout() {
   const [user, setUser] = useState(null);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { theme, uiMode } = useTheme(); // Get both theme and uiMode
+  const { theme, uiMode } = useTheme();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -30,26 +30,21 @@ export default function Layout() {
     };
   }, []);
 
-  // Apply theme and uiMode to the body element
   useEffect(() => {
     const body = document.body;
 
-    // Update data attributes
     body.setAttribute("data-ui-mode", uiMode);
     body.setAttribute("data-theme", theme);
 
-    // Remove any old `theme-*` class
     body.className = body.className
       .split(" ")
       .filter((cls) => !cls.startsWith("theme-"))
       .join(" ");
 
-    // Add the new theme class
     body.classList.add(`theme-${theme}`);
   }, [uiMode, theme]);
 
   return (
-    // Remove the outer div with theme classes, let body handle it
     <div className="min-h-screen flex flex-col"> {/* Keep a wrapper div if needed for layout, but remove theme classes */}
       {user && <Navbar openGoalModal={() => setShowGoalModal(true)} />}
 
