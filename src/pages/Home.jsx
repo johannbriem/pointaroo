@@ -22,7 +22,7 @@ export default function Home() {
   const [purchases, setPurchases] = useState([]);
   const [rewards, setRewards] = useState([]);
   const { t } = useTranslation();
-  //const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { theme, uiMode, setTheme, setUiMode } = useTheme();
   const { emoji, name, mascot } = useThemeMeta(theme);
 
@@ -158,6 +158,8 @@ export default function Home() {
   if (!user) return <LandingPage />;
   if (role === "admin") return <p className="text-center mt-10 text-gray-500">{t("app.redirectingAdmin")}</p>;
 
+  console.log("Home component rendered"); // Diagnostic log
+
   return (
     <div className={`max-w-6xl mx-auto p-4 sm:p-6 text-center ${uiMode === "kid" ? `theme-${theme}` : "parent-mode"}`}>
       <div className="flex justify-center mb-4">
@@ -185,11 +187,7 @@ export default function Home() {
                 <span className="bg-white/30 px-3 py-1 rounded-full font-semibold">{t("home.parentPays")}: {goal.parent_percent}%</span>
               </div>
               <p className="text-white text-sm italic">{t("home.motivation")}</p>
-              <div className="relative w-full bg-white/30 h-6 rounded-full overflow-hidden mt-3">
-                <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-yellow-400 to-green-500 text-white text-sm font-bold flex items-center justify-center transition-all" style={{ width: `${Math.min((availablePoints / childGoal) * 100, 100)}%` }}>
-                  {availablePoints} / {childGoal} {t("tasks.points")}
-                </div>
-              </div>
+              <ProgressBar total={availablePoints} goal={childGoal} />
             </div>
           </div>
         ) : (
@@ -199,6 +197,8 @@ export default function Home() {
             <p className="text-sm text-blue-700 mt-2">{t("app.setGoalAdmin")}</p>
           </div>
         )}
+
+        
 
         <div className="max-w-4xl mx-auto px-4">
           <TaskList
