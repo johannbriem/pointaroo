@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import TaskList from "../components/TaskList";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import ProgressBar from "../components/ProgressBar";
 import { startOfDay, endOfDay } from "date-fns";
 import { useTranslation } from "react-i18next";
 import LandingPage from "./LandingPage";
+import { useTheme } from "../components/ThemeContext";
+import useThemeMeta from "../components/useThemeMeta";
 
 const GOAL = 100;
 
@@ -15,56 +17,63 @@ export default function Home() {
   const [tasks, setTasks] = useState([]);
   const [completionsToday, setCompletionsToday] = useState([]);
   const [allCompletions, setAllCompletions] = useState([]);
-  const [rewardRequests, setRewardRequests] = useState([]); // New state for reward requests
+  const [rewardRequests, setRewardRequests] = useState([]);
   const [goal, setGoal] = useState(null);
   const [purchases, setPurchases] = useState([]);
   const [rewards, setRewards] = useState([]);
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
+  const { theme, uiMode, setTheme, setUiMode } = useTheme();
+  const { emoji, name, mascot } = useThemeMeta(theme);
 
   useEffect(() => {
-    // Set the document title for the main app view
     document.title = t("app.title");
   }, [t]);
 
   useEffect(() => {
     if (user) {
-      setRole(user.user_metadata?.role || null);
+      const detectedRole = user.user_metadata?.role || null;
+      setRole(detectedRole);
+
+      const storedUiMode = localStorage.getItem("uiMode");
+      const storedTheme = localStorage.getItem("theme");
+
+      if (!storedUiMode) setUiMode(detectedRole === "admin" ? "parent" : "kid");
+      if (!storedTheme) setTheme("space");
     } else {
       setRole(null);
     }
   }, [user]);
 
-  // 🔄 Fetch tasks for kids
+  useEffect(() => {
+    localStorage.setItem("uiMode", uiMode);
+  }, [uiMode]);
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   useEffect(() => {
     if (loading) return;
 
     if (user) {
-        fetchTasks();
-        fetchCompletionsToday();
-        fetchAllCompletions();
-        fetchRewardRequests(); // Fetch reward requests
-        fetchGoal();
-        fetchPurchases();
-        fetchRewards();
+      fetchTasks();
+      fetchCompletionsToday();
+      fetchAllCompletions();
+      fetchRewardRequests();
+      fetchGoal();
+      fetchPurchases();
+      fetchRewards();
     } else {
-      // Clear data when user logs out
       setTasks([]);
       setCompletionsToday([]);
       setAllCompletions([]);
-      setRewardRequests([]); // Clear reward requests
+      setRewardRequests([]);
       setGoal(null);
       setPurchases([]);
       setRewards([]);
     }
   }, [user?.id, loading]);
-
-  // Redirect admin users to the admin panel
-  useEffect(() => {
-    if (role === "admin") {
-      navigate("/admin");
-    }
-  }, [role, navigate]);
 
   const fetchTasks = async () => {
     const { data } = await supabase.from("tasks").select("*");
@@ -92,8 +101,8 @@ export default function Home() {
   const fetchRewardRequests = async () => {
     const { data } = await supabase
       .from("reward_requests")
-      .select("*, rewards(name, cost)") // Fetch reward details for display
-      .eq("user_id", user.id); // Only fetch current user's requests
+      .select("*, rewards(name, cost)")
+      .eq("user_id", user.id);
     if (data) setRewardRequests(data);
   };
 
@@ -132,12 +141,10 @@ export default function Home() {
   }, 0);
 
   const purchasedPoints = purchases.reduce((sum, p) => {
-    // Use the cost from the purchase record, which is more accurate.
     return sum + (parseInt(p.cost) || 0);
   }, 0);
 
   const pendingRequestedPoints = rewardRequests.reduce((sum, req) => {
-    // Only pending requests deduct points immediately
     if (req.status === 'pending') {
       return sum + (parseInt(req.points_deducted) || 0);
     }
@@ -145,67 +152,65 @@ export default function Home() {
   }, 0);
 
   const spentPoints = purchasedPoints + pendingRequestedPoints;
-
   const availablePoints = earnedPoints - spentPoints;
 
-  if (loading) {
-    return <p className="text-center mt-10 text-gray-500">Loading...</p>;
-  }
+  if (loading) return <p className="text-center mt-10 text-gray-500">Loading...</p>;
+  if (!user) return <LandingPage />;
+  if (role === "admin") return <p className="text-center mt-10 text-gray-500">{t("app.redirectingAdmin")}</p>;
 
-  if (!user) {
-    return <LandingPage />;
-  }
-
-  // If user is an admin, show a redirect message while the useEffect navigates them.
-  if (role === "admin") {
-    return <p className="text-center mt-10 text-gray-500">{t("app.redirectingAdmin")}</p>;
-  }
-
-  // For any other logged-in user (e.g., 'kid' or no role set), show the task view.
-  // This is a safer default than a blank page.
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6 text-center">
+    <div className={`max-w-6xl mx-auto p-4 sm:p-6 text-center ${uiMode === "kid" ? `theme-${theme}` : "parent-mode"}`}>
       <div className="flex justify-center mb-4">
         <img src="/logo.png" alt={t("app.title")} className="h-12" />
       </div>
 
-      {goal ? ( // Conditional rendering based on whether a goal exists
-        <>
-          <div className="mb-6 border p-4 rounded-lg bg-gray-50 text-left md:flex md:items-center md:gap-6">
+      <h1 className="text-2xl font-bold mb-2">
+        {emoji} Welcome to {name} World!
+      </h1>
+      <p className="text-sm text-[var(--color-text-secondary)]">Say hi to {mascot} 👋</p>
+
+
+      {/* Removed theme selector buttons from here */}
+
+      <div className="max-w-4xl mx-auto px-4">
+        {goal ? (
+          <div className="rounded-3xl p-6 mb-6 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg flex flex-col md:flex-row items-center gap-6">
             {goal.phone_image && (
-              <img
-                src={goal.phone_image}
-                alt={goal.phone_model}
-                className="w-full rounded-md md:w-1/3 lg:w-1/4 h-40 object-contain mb-4 md:mb-0"
-              />
+              <img src={goal.phone_image} alt={goal.phone_model} className="w-28 h-28 object-contain rounded-xl bg-white p-2" />
             )}
-            <div className="flex-1">
-              <h2 className="text-xl font-bold mb-2">🎯 {t("home.goal")}: {goal.phone_model}</h2>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                <p><span className="font-semibold">{t("home.totalCost")}:</span> ${goal.total_cost}</p>
-                <p><span className="font-semibold">{t("home.parentPays")}:</span> {goal.parent_percent}%</p>
-                <p className="col-span-2 text-base font-bold text-green-600"> {/* Translated "Your goal" */}
-                  {t("home.yourGoal")}: ${Math.ceil(goal.total_cost * (1 - goal.parent_percent / 100))}
-                </p>
+            <div className="text-left space-y-2 w-full">
+              <h3 className="text-lg md:text-xl font-bold">🎯 {t("home.goal")}: {goal.phone_model}</h3>
+              <div className="flex gap-4 text-sm md:text-base">
+                <span className="bg-yellow-300 text-black px-3 py-1 rounded-full font-semibold">{t("home.yourGoal")}: ${childGoal}</span>
+                <span className="bg-white/30 px-3 py-1 rounded-full font-semibold">{t("home.parentPays")}: {goal.parent_percent}%</span>
+              </div>
+              <p className="text-white text-sm italic">{t("home.motivation")}</p>
+              <div className="relative w-full bg-white/30 h-6 rounded-full overflow-hidden mt-3">
+                <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-yellow-400 to-green-500 text-white text-sm font-bold flex items-center justify-center transition-all" style={{ width: `${Math.min((availablePoints / childGoal) * 100, 100)}%` }}>
+                  {availablePoints} / {childGoal} {t("tasks.points")}
+                </div>
               </div>
             </div>
           </div>
-          <ProgressBar total={availablePoints} goal={childGoal} />
-        </>
-      ) : (
-        // No goal set, show just the total points
-        <div className="mb-6 p-4 rounded-lg bg-blue-50 text-center">
-          <h2 className="text-xl font-bold text-blue-800 mb-2">{t("app.yourCurrentPoints")}</h2>
-          <p className="text-4xl font-extrabold text-blue-900">{availablePoints} {t("tasks.points")}</p>
-          <p className="text-sm text-blue-700 mt-2">{t("app.setGoalAdmin")}</p>
+        ) : (
+          <div className="mb-6 p-4 rounded-lg bg-blue-50 text-center">
+            <h2 className="text-xl font-bold text-blue-800 mb-2">{t("app.yourCurrentPoints")}</h2>
+            <p className="text-4xl font-extrabold text-blue-900">{availablePoints} {t("tasks.points")}</p>
+            <p className="text-sm text-blue-700 mt-2">{t("app.setGoalAdmin")}</p>
+          </div>
+        )}
+
+        <div className="max-w-4xl mx-auto px-4">
+          <TaskList
+            tasks={tasks}
+            onComplete={handleTaskSuccessfullyCompleted}
+            completionsToday={completionsToday}
+            userId={user.id}
+            theme={theme}
+            uiMode={uiMode}
+          />
         </div>
-      )}
-      <TaskList
-        tasks={tasks}
-        onComplete={handleTaskSuccessfullyCompleted}
-        completionsToday={completionsToday}
-        userId={user.id}
-      />
+      </div>
     </div>
   );
 }

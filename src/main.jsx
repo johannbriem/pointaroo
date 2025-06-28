@@ -12,6 +12,9 @@ import Login from "./pages/Login.jsx"; // ✅ import Login page
 import Signup from "./pages/Signup.jsx"; // ✅ import Signup page
 import JoinPage from "./pages/JoinPage.jsx"; // ✅ import JoinPage for family invites
 import './i18n';
+import { ThemeProvider } from "./components/ThemeContext.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx"; // ✅ import ErrorBoundary
+
 
 function StoreRouteWrapper() {
   const [user, setUser] = useState(null);
@@ -105,7 +108,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/join-family" element={<JoinPage />} />
     </Routes>
   </BrowserRouter>
 );
+

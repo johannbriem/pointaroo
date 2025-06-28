@@ -200,102 +200,111 @@ export default function Store() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {rewards.map(reward => {
-          const afford = canAfford(reward.cost);
-          const purchased = isPurchased(reward.id);
-          const pendingRequest = isPendingRequest(reward.id);
-          const cooldownInfo = getCooldownInfo(reward);
-          const underCooldown = cooldownInfo.isUnderCooldown;
-          const isDisabled = !afford || purchased || pendingRequest || underCooldown;
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  {rewards.map(reward => {
+    const afford = canAfford(reward.cost);
+    const purchased = isPurchased(reward.id);
+    const pendingRequest = isPendingRequest(reward.id);
+    const cooldownInfo = getCooldownInfo(reward);
+    const underCooldown = cooldownInfo.isUnderCooldown;
+    const isDisabled = !afford || purchased || pendingRequest || underCooldown;
 
-          let buttonText = t("store.redeem");
-          if (purchased) buttonText = t("store.purchased");
-          else if (pendingRequest) buttonText = t("store.requested");
-          else if (underCooldown) buttonText = t("store.cooldown", { days: reward.request_cooldown_days });
-          else if (!afford) buttonText = t("store.notEnough");
-          else if (reward.requires_approval) buttonText = t("store.request");
+    let buttonText = t("store.redeem");
+    if (purchased) buttonText = t("store.purchased");
+    else if (pendingRequest) buttonText = t("store.requested");
+    else if (underCooldown) buttonText = t("store.cooldown", { days: reward.request_cooldown_days });
+    else if (!afford) buttonText = t("store.notEnough");
+    else if (reward.requires_approval) buttonText = t("store.request");
 
-          return (
-            <div
-              key={reward.id}
-              className={`rounded border shadow-sm flex flex-col ${
-                purchased
-                  ? "bg-green-50 text-gray-900"
-                  : pendingRequest
-                  ? "bg-yellow-50 text-gray-900"
-                  : afford
-                  ? "bg-white text-gray-900"
-                  : "bg-gray-100 text-gray-400"
-              }`}
+    return (
+      <div
+        key={reward.id}
+        className="rounded-xl border shadow-sm flex flex-col transition-all hover:scale-[1.01]"
+        style={{
+          backgroundColor: "var(--color-bg-card)",
+          borderColor: "var(--color-border)",
+          color: "var(--color-text)",
+        }}
+      >
+        {reward.photo_url && (
+          <img
+            src={reward.photo_url}
+            alt={reward.name}
+            className="w-full h-40 object-cover rounded-t"
+          />
+        )}
+        <div className="p-4 flex flex-col flex-grow">
+          <h2
+            className="text-lg font-bold mb-1"
+            style={{ color: "var(--color-text-strong)" }}
+          >
+            {reward.name}
+          </h2>
+          {reward.request_cooldown_days > 0 && (
+            <p
+              className="text-xs font-semibold mb-1"
+              style={{ color: "var(--color-text-muted)" }}
             >
-              {reward.photo_url && (
-                <img
-                  src={reward.photo_url}
-                  alt={reward.name}
-                  className="w-full h-40 object-cover rounded-t"
-                />
-              )}
-              <div className="p-4 flex flex-col flex-grow">
-                <h2 className="text-lg font-semibold mb-1">{reward.name}</h2>
-                {reward.request_cooldown_days > 0 && (
-                  <p className="text-xs text-purple-600 font-semibold mb-1">
-                    {t("store.dayCooldown", { days: reward.request_cooldown_days })}
-                  </p>
-                )}
-                <p className="text-sm flex-grow">{reward.description}</p>
-                <p className="mt-2 font-bold">{reward.cost} pts</p>
+              {t("store.dayCooldown", { days: reward.request_cooldown_days })}
+            </p>
+          )}
+          <p className="text-sm flex-grow" style={{ color: "var(--color-text)" }}>
+            {reward.description}
+          </p>
+          <p className="mt-2 font-bold" style={{ color: "var(--color-text-strong)" }}>
+            {reward.cost} pts
+          </p>
 
-                {underCooldown && cooldownInfo.remainingTime > 0 && (
-                  <div className="mt-3 px-4 py-3 bg-blue-100 border border-blue-300 rounded-xl shadow-inner">
-                    <div className="flex items-center text-blue-900 mb-2">
-                      <span className="text-xl mr-2 animate-pulse">⏳</span>
-                      <span className="font-semibold">{t("store.cooldownActive")}</span>
-                    </div>
-                    <div className="ml-6 text-sm text-blue-800">
-                      <p>
-                        <span className="font-medium">{t("store.timeLeft")}:</span>{" "}
-                        {formatRemainingTime(cooldownInfo.remainingTime)}
-                      </p>
-                    </div>
-                    <div className="mt-2 bg-blue-200 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="h-full bg-blue-600 transition-all duration-1000"
-                        style={{
-                          width: `${
-                            100 -
-                            (cooldownInfo.remainingTime /
-                              (reward.request_cooldown_days * 24 * 60 * 60 * 1000)) *
-                              100
-                          }%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  disabled={isDisabled}
-                  onClick={() => handleBuy(reward)}
-                  className={`mt-3 px-4 py-2 rounded text-white w-full ${
-                    purchased
-                      ? "bg-green-500 cursor-not-allowed"
-                      : pendingRequest
-                      ? "bg-yellow-500 cursor-not-allowed"
-                      : underCooldown
-                      ? "bg-orange-500 cursor-not-allowed"
-                      : afford
-                      ? "bg-blue-600 hover:bg-blue-700"
-                      : "bg-gray-400 cursor-not-allowed"
-                  }`}
-                >
-                  {buttonText}
-                </button>
+          {underCooldown && cooldownInfo.remainingTime > 0 && (
+            <div
+              className="mt-3 px-4 py-3 rounded-xl shadow-inner border"
+              style={{
+                backgroundColor: "var(--color-bg-subtle)",
+                borderColor: "var(--color-border-muted)",
+                color: "var(--color-text-muted)",
+              }}
+            >
+              <div className="flex items-center mb-2">
+                <span className="text-xl mr-2 animate-pulse">⏳</span>
+                <span className="font-semibold">
+                  {t("store.cooldownActive")}
+                </span>
+              </div>
+              <p className="ml-6 text-sm">
+                <span className="font-medium">{t("store.timeLeft")}:</span>{" "}
+                {formatRemainingTime(cooldownInfo.remainingTime)}
+              </p>
+              <div className="mt-2 bg-[var(--color-bg-muted)] rounded-full h-3 overflow-hidden">
+                <div
+                  className="h-full transition-all duration-1000"
+                  style={{
+                    width: `${
+                      100 -
+                      (cooldownInfo.remainingTime /
+                        (reward.request_cooldown_days * 24 * 60 * 60 * 1000)) *
+                        100
+                    }%`,
+                    backgroundColor: "var(--color-primary)",
+                  }}
+                ></div>
               </div>
             </div>
-          );
-        })}
+          )}
+
+          <button
+            disabled={isDisabled}
+            onClick={() => handleBuy(reward)}
+            className={`button w-full mt-4 ${
+              isDisabled ? "opacity-60 cursor-not-allowed" : "hover:scale-[1.02]"
+            }`}
+          >
+            {buttonText}
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  })}
+</div>
+</div>
+);
 }

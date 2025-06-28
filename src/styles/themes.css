@@ -1,0 +1,81 @@
+/* Default Light Theme */
+:root {
+  --background-primary: #ffffff;
+  --background-secondary: #f8f9fa;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --accent-primary: #007bff;
+  --accent-secondary: #6c757d;
+  --border-color: #dee2e6;
+  --card-background: #ffffff;
+  --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  --button-text: #ffffff;
+}
+
+/* Default Dark Theme */
+[data-theme='dark'] {
+  --background-primary: #121212;
+  --background-secondary: #1e1e1e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --accent-primary: #bb86fc;
+  --accent-secondary: #03dac6;
+  --border-color: #333333;
+  --card-background: #1e1e1e;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  --button-text: #121212;
+}
+
+/* Kid Themes from your translation file */
+
+[data-theme='space'] {
+  --background-primary: #0d1117;
+  --background-secondary: #161b22;
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --accent-primary: #58a6ff;
+  --accent-secondary: #f778ba;
+  --border-color: #30363d;
+  --card-background: #161b22;
+  --card-shadow: 0 0 15px rgba(88, 166, 255, 0.3);
+  --button-text: #ffffff;
+}
+
+[data-theme='jungle'] {
+  --background-primary: #f0f4f0;
+  --background-secondary: #e4e9e4;
+  --text-primary: #2c3e50;
+  --text-secondary: #34495e;
+  --accent-primary: #27ae60;
+  --accent-secondary: #f39c12;
+  --border-color: #bdc3c7;
+  --card-background: #ffffff;
+  --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  --button-text: #ffffff;
+}
+
+[data-theme='robot'] {
+  --background-primary: #c5c6c8;
+  --background-secondary: #d1d3d4;
+  --text-primary: #333333;
+  --text-secondary: #555555;
+  --accent-primary: #d9534f;
+  --accent-secondary: #5bc0de;
+  --border-color: #a9a9a9;
+  --card-background: #e1e2e4;
+  --card-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  --button-text: #ffffff;
+}
+
+[data-theme='ocean'] {
+  --background-primary: #e0f7fa;
+  --background-secondary: #b2ebf2;
+  --text-primary: #006064;
+  --text-secondary: #00838f;
+  --accent-primary: #00bcd4;
+  --accent-secondary: #ff9800;
+  --border-color: #80deea;
+  --card-background: #ffffff;
+  --card-shadow: 0 2px 4px rgba(0, 188, 212, 0.2);
+  --button-text: #006064;
+}
