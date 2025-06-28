@@ -139,14 +139,15 @@
     "logout": "Logout",
     "menu": "Menu",
     "themeMode": "Theme Mode",
-    "lightMode": "Light Mode",
-    "darkMode": "Dark Mode",
+    "lightMode": "☀️ Light",
+    "darkMode": "🌙 Dark",
     "systemMode": "System Mode",
     "kidThemes": "Kid Themes",
     "spaceTheme": "🪐 Space",
     "jungleTheme": "🐸 Jungle",
     "robotTheme": "🤖 Robot",
-    "oceanTheme": "🐠 Ocean"
+    "oceanTheme": "🐠 Ocean",
+    "closeMenu": "Close Menu"
   },
   "taskModal": {
     "beforePhoto": "📸 Before Photo",

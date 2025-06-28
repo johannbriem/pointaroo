@@ -6,6 +6,7 @@ import ProgressBar from "./components/ProgressBar";
 import { startOfDay, endOfDay } from "date-fns"; // for date range filtering
 import GoalModal from "./components/GoalModal";
 import './i18n';
+import "./styles/themes.css";
 
 const GOAL = 100;
 
