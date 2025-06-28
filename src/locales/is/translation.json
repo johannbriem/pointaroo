@@ -1,8 +1,8 @@
 {
   "common": {
-    "submit": "Senda",
-    "cancel": "Hætta við",
-    "yes": "Já",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "yes": "Yes",
     "no": "Nei",
     "saveChanges": "Vista breytingar",
     "add": "Bæta við",
@@ -62,7 +62,7 @@
     "balance": "Staða þín",
     "redeem": "Innleysa",
     "purchased": "Keypt!",
-    "requested": "Biðja um (í bið)",
+    "requested": "Óstaðfest (í bið)",
     "cooldown": "Kólnun ({{days}} dagar)",
     "notEnough": "Ekki nóg af stigum",
     "request": "Biðja um",
@@ -118,10 +118,10 @@
     "forgotPassword": "Gleymt lykilorð?",
     "noAccount": "Ertu ekki með aðgang?",
     "signup": "Nýskráning"
-},
+  },
   "signupPage": {
     "title": "Nýskráning",
-    "savingFor": "Hvað ertu að safna fyrir?",
+    "savingFor": "Hverju ertu að safna fyrir?",
     "optionalLink": "Valfrjáls tengill á hlutinn",
     "iamKid": "👧 Ég er barn",
     "iamParent": "👨‍👩‍👧 Ég er foreldri"
@@ -132,16 +132,40 @@
   },
   "navbar": {
     "store": "Búð",
-    "completions": "Lokanir",
+    "completions": "Kláruð verkefni",
     "admin": "Stjórnborð",
-    "myGoal": "Markmið mitt",
+    "myGoal": "Mitt markmið",
     "installApp": "Setja upp forrit",
-    "logout": "Útskrá"
+    "logout": "Útskrá",
+    "menu": "Valmynd",
+    "themeMode": "Þema stilling",
+    "lightMode": "Ljós stilling",
+    "darkMode": "Dökk stilling",
+    "systemMode": "Kerfisstilling",
+    "spaceTheme": "🪐 Geimurinn",
+    "jungleTheme": "🐸 Frumskógur",
+    "robotTheme": "🤖 Vélmenni",
+    "oceanTheme": "🐠 Sjórinn",
+    "closeMenu": "Loka valmynd",
+    "openMenu": "Opna valmynd",
+    "pirateTheme": "🏴‍☠️ Sjóræningi",
+    "kidThemes": "Breyta þema:"
   },
   "taskModal": {
     "beforePhoto": "📸 Fyrir mynd",
     "afterPhoto": "📸 Eftir mynd",
     "confirmCompletion": "Staðfesta lokun",
     "saving": "Vista..."
+  },
+  "landing": {
+    "subtitle": "A fun way for kids to earn their phone and build healthy habits.",
+    "howTitle": "How it works",
+    "setGoal": "Set a goal",
+    "setGoalText": "Pick a phone model and let kids know what they’re working toward.",
+    "completeTasks": "Complete tasks",
+    "completeTasksText": "Kids upload before/after photos to earn points for chores.",
+    "redeemRewards": "Earn rewards",
+    "redeemRewardsText": "Track progress, unlock rewards, and reach their goal!",
+    "ready": "Ready to start your Pointaroo journey?"
   }
 }

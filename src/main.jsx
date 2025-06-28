@@ -11,6 +11,9 @@ import Layout from "./Layout.jsx"; // ✅ import Layout component
 import Login from "./pages/Login.jsx"; // ✅ import Login page
 import Signup from "./pages/Signup.jsx"; // ✅ import Signup page
 import './i18n';
+import { ThemeProvider } from "./components/ThemeContext.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx"; // ✅ import ErrorBoundary
+
 
 function StoreRouteWrapper() {
   const [user, setUser] = useState(null);
@@ -79,16 +82,21 @@ function StoreRouteWrapper() {
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/store" element={<Store />} />
-        <Route path="/completions" element={<Completions />} />
-      </Route>
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-    </Routes>
-  </BrowserRouter>
+  <ErrorBoundary>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/store" element={<StoreRouteWrapper />} />
+            <Route path="/completions" element={<Completions />} />
+          </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
+  </ErrorBoundary>
 );
+

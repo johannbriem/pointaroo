@@ -118,7 +118,7 @@
     "forgotPassword": "Forgot password?",
     "noAccount": "Don't have an account?",
     "signup": "Sign up"
-},
+  },
   "signupPage": {
     "title": "Sign Up",
     "savingFor": "What are you saving for?",
@@ -136,7 +136,19 @@
     "admin": "Admin",
     "myGoal": "My Goal",
     "installApp": "Install App",
-    "logout": "Logout"
+    "logout": "Logout",
+    "menu": "Menu",
+    "themeMode": "Theme Mode",
+    "lightMode": "☀️ Light",
+    "darkMode": "🌙 Dark",
+    "systemMode": "System Mode",
+    "kidThemes": "Kid Themes",
+    "spaceTheme": "🪐 Space",
+    "jungleTheme": "🐸 Jungle",
+    "robotTheme": "🤖 Robot",
+    "oceanTheme": "🐠 Ocean",
+    "closeMenu": "Close Menu",
+    "pirateTheme": "🏴‍☠️ Pirate"
   },
   "taskModal": {
     "beforePhoto": "📸 Before Photo",
@@ -154,5 +166,5 @@
     "redeemRewards": "Earn rewards",
     "redeemRewardsText": "Track progress, unlock rewards, and reach their goal!",
     "ready": "Ready to start your Pointaroo journey?"
-}
+  }
 }
