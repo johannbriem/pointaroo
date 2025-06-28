@@ -5,6 +5,7 @@ import { XMarkIcon, Bars3Icon, Bars3BottomRightIcon } from "@heroicons/react/24/
 import LanguageSelector from "./LanguageSelector";
 import { supabase } from "../supabaseClient";
 import { useTheme } from "./ThemeContext";
+import useThemeMeta from "./useThemeMeta";
 
 export default function Navbar({ openGoalModal }) {
   const [user, setUser] = useState(null);
@@ -16,6 +17,8 @@ export default function Navbar({ openGoalModal }) {
   const [userDisplayName, setUserDisplayName] = useState("User");
   const { t } = useTranslation();
   const { uiMode, theme, setTheme, setUiMode } = useTheme();
+  const { emoji, mascot, name: themeName } = useThemeMeta(theme);
+
 
   const [darkModePreference, setDarkModePreference] = useState(() => {
     const savedPreference = localStorage.getItem('theme-mode');
@@ -227,73 +230,57 @@ export default function Navbar({ openGoalModal }) {
 
       {/* New Menu Card (Desktop and Mobile) */}
       {showMenu && (
-        <div
-          className={`fixed top-16 right-4 w-64 bg-[var(--color-navbar-bg)] shadow-lg rounded-lg p-4 z-50 transition-all duration-300 ease-in-out transform ${showMenu ? "scale-100 opacity-100" : "scale-95 opacity-0"}
-          md:block`}
-        >
+        <div className="fixed top-16 right-4 w-64 bg-[var(--color-navbar-bg)] text-[var(--color-navbar-text)] shadow-lg rounded-lg p-4 z-50 transition-all duration-300 ease-in-out transform scale-100 opacity-100 md:block">
           <div className="flex flex-col gap-2">
             {isAdmin && (
-              <Link to="/admin" className="nav-link-mobile bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-md" onClick={() => setShowMenu(false)}>
+              <Link
+                to="/admin"
+                className="nav-link-mobile bg-[var(--color-primary)] text-[var(--button-text)] text-center py-2 rounded-md"
+                onClick={() => setShowMenu(false)}
+              >
                 {t("navbar.admin")}
               </Link>
             )}
+
             <button onClick={() => { openGoalModal(); setShowMenu(false); }} className="nav-link-mobile">
               🎯 {t("navbar.myGoal")}
             </button>
+
             {showInstallBtn && (
-              <button
-                onClick={() => { handleInstallClick(); setShowMenu(false); }}
-                className="btn-install-mobile"
-              >
+              <button onClick={() => { handleInstallClick(); setShowMenu(false); }} className="btn-install-mobile">
                 📲 {t("navbar.installApp")}
               </button>
             )}
+
             <button onClick={() => { handleLogout(); setShowMenu(false); }} className="btn-logout-mobile">
               {t("navbar.logout")}
             </button>
+
             <div className="mt-4">
               <LanguageSelector userId={user.id} />
-              {/* Dark Mode Toggle for Desktop Menu Card */}
-              <div className="flex flex-col gap-2 mt-4">
-                <span className="text-sm font-semibold text-[var(--color-navbar-text)]">{t("navbar.themeMode")}</span>
-                <button
-                  onClick={() => setDarkModePreference('light')}
-                  className={`px-3 py-1 rounded-md text-sm font-bold border ${darkModePreference === 'light' ? 'bg-[var(--color-primary)] text-[var(--color-button-text)]' : 'bg-[var(--color-navbar-hover-bg)] text-[var(--color-navbar-text)]'} transition`}
-                >
-                  {t("navbar.lightMode")}
-                </button>
-                <button
-                  onClick={() => setDarkModePreference('dark')}
-                  className={`px-3 py-1 rounded-md text-sm font-bold border ${darkModePreference === 'dark' ? 'bg-[var(--color-primary)] text-[var(--color-button-text)]' : 'bg-[var(--color-navbar-hover-bg)] text-[var(--color-navbar-text)]'} transition`}
-                >
-                  {t("navbar.darkMode")}
-                </button>
-                <button
-                  onClick={() => setDarkModePreference('system')}
-                  className={`px-3 py-1 rounded-md text-sm font-bold border ${darkModePreference === 'system' ? 'bg-[var(--color-primary)] text-[var(--color-button-text)]' : 'bg-[var(--color-navbar-hover-bg)] text-[var(--color-navbar-text)]'} transition`}
-                >
-                  {t("navbar.systemMode")}
-                </button>
-              </div>
+
+              {/* Theme selector for kids only */}
+              {uiMode === "kid" && (
+                <div className="flex flex-col gap-2 mt-4">
+                  <span className="text-sm font-semibold text-[var(--color-navbar-text)]">{t("navbar.kidThemes")}</span>
+                  <select
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md text-black bg-[var(--color-navbar-hover-bg)]"
+                  >
+                    <option value="space">{t("navbar.spaceTheme")}</option>
+                    <option value="jungle">{t("navbar.jungleTheme")}</option>
+                    <option value="robot">{t("navbar.robotTheme")}</option>
+                    <option value="ocean">{t("navbar.oceanTheme")}</option>
+                    <option value="pirate">{t("navbar.pirateTheme")}</option>
+                  </select>
+                </div>
+              )}
             </div>
-            {uiMode === "kid" && (
-              <div className="flex flex-col gap-2 mt-4">
-                <span className="text-sm font-semibold text-[var(--color-navbar-text)]">{t("navbar.kidThemes")}</span>
-                <select
-                  value={theme}
-                  onChange={(e) => setTheme(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md text-black bg-[var(--color-navbar-hover-bg)]"
-                >
-                  <option value="space">{t("navbar.spaceTheme")}</option>
-                  <option value="jungle">{t("navbar.jungleTheme")}</option>
-                  <option value="robot">{t("navbar.robotTheme")}</option>
-                  <option value="ocean">{t("navbar.oceanTheme")}</option>
-                </select>
-              </div>
-            )}
           </div>
         </div>
       )}
+
 
       {/* Overlay for both mobile menu and new menu card */}
             {(menuOpen || showMenu) && (

@@ -32,17 +32,21 @@ export default function Layout() {
 
   // Apply theme and uiMode to the body element
   useEffect(() => {
-    console.log("Layout useEffect - uiMode:", uiMode, "theme:", theme);
-    // Set data-theme based on uiMode (kid or parent)
-    document.body.setAttribute('data-theme', uiMode === "kid" ? "kids" : "modern");
-    // Apply the specific theme class if in kid mode
-    if (uiMode === "kid") {
-      document.body.classList.add(`theme-${theme}`);
-    } else {
-      // Remove any previous theme classes if switching to parent mode
-      document.body.className = document.body.className.replace(/theme-\w+/g, '');
-    }
-  }, [uiMode, theme]); // Depend on both uiMode and theme
+    const body = document.body;
+
+    // Update data attributes
+    body.setAttribute("data-ui-mode", uiMode);
+    body.setAttribute("data-theme", theme);
+
+    // Remove any old `theme-*` class
+    body.className = body.className
+      .split(" ")
+      .filter((cls) => !cls.startsWith("theme-"))
+      .join(" ");
+
+    // Add the new theme class
+    body.classList.add(`theme-${theme}`);
+  }, [uiMode, theme]);
 
   return (
     // Remove the outer div with theme classes, let body handle it

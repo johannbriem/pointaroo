@@ -11,19 +11,17 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     const body = document.body;
 
+    // Clear old theme classes
+    body.className = body.className
+      .split(" ")
+      .filter((cls) => !cls.startsWith("theme-"))
+      .join(" ");
+
     body.setAttribute("data-ui-mode", uiMode);
-    body.setAttribute("data-theme", uiMode === "kid" ? "kids" : "modern");
-
-    // Clear all `theme-*` classes
-    body.className = body.className.replace(/theme-\w+/g, "").trim();
-
-    if (uiMode === "kid") {
-      body.classList.add(`theme-${theme}`);
-    }
-
-    localStorage.setItem("theme", theme);
-    localStorage.setItem("uiMode", uiMode);
+    body.setAttribute("data-theme", theme);
+    body.classList.add(`theme-${theme}`);
   }, [theme, uiMode]);
+
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, uiMode, setUiMode }}>

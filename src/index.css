@@ -289,24 +289,6 @@ body[data-theme='modern'].dark {
   --color-border: #4a5568;
 }
 
-/* Kids Theme (Colorful) */
-body[data-theme='kids'] {
-  --color-primary: #ff6b6b;
-  /* Playful red */
-  --color-secondary: #ffe66d;
-  /* Sunny yellow */
-  --color-background: #f0f8ff;
-  /* Light blue background */
-  --color-text: #333333;
-  --color-navbar-bg: #a7e9af;
-  /* Greenish navbar */
-  --color-navbar-text: #333333;
-  --color-navbar-hover-bg: #8bc34a;
-  --color-button-bg: var(--color-primary);
-  --color-button-text: #ffffff;
-  --color-border: #c8e6c9;
-}
-
 /* Dark Mode for Kids Theme (optional, adjust as needed) */
 body[data-theme='kids'].dark {
   --color-background: #2c3e50;
