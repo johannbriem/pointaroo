@@ -62,7 +62,7 @@
     "balance": "Staða þín",
     "redeem": "Innleysa",
     "purchased": "Keypt!",
-    "requested": "Biðja um (í bið)",
+    "requested": "Óstaðfest (í bið)",
     "cooldown": "Kólnun ({{days}} dagar)",
     "notEnough": "Ekki nóg af stigum",
     "request": "Biðja um",
@@ -121,7 +121,7 @@
   },
   "signupPage": {
     "title": "Nýskráning",
-    "savingFor": "Hvað ertu að safna fyrir?",
+    "savingFor": "Hverju ertu að safna fyrir?",
     "optionalLink": "Valfrjáls tengill á hlutinn",
     "iamKid": "👧 Ég er barn",
     "iamParent": "👨‍👩‍👧 Ég er foreldri"
@@ -132,16 +132,24 @@
   },
   "navbar": {
     "store": "Búð",
-    "completions": "Lokanir",
+    "completions": "Kláruð verkefni",
     "admin": "Stjórnborð",
-    "myGoal": "Markmið mitt",
+    "myGoal": "Mitt markmið",
     "installApp": "Setja upp forrit",
     "logout": "Útskrá",
     "menu": "Valmynd",
     "themeMode": "Þema stilling",
     "lightMode": "Ljós stilling",
     "darkMode": "Dökk stilling",
-    "systemMode": "Kerfisstilling"
+    "systemMode": "Kerfisstilling",
+    "spaceTheme": "🪐 Geimurinn",
+    "jungleTheme": "🐸 Frumskógur",
+    "robotTheme": "🤖 Vélmenni",
+    "oceanTheme": "🐠 Sjórinn",
+    "closeMenu": "Loka valmynd",
+    "openMenu": "Opna valmynd",
+    "pirateTheme": "🏴‍☠️ Sjóræningi",
+    "kidThemes": "Breyta þema:"
   },
   "taskModal": {
     "beforePhoto": "📸 Fyrir mynd",

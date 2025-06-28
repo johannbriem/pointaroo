@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import TaskList from "../components/TaskList";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import ProgressBar from "../components/ProgressBar";
 import { startOfDay, endOfDay } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -22,7 +22,7 @@ export default function Home() {
   const [purchases, setPurchases] = useState([]);
   const [rewards, setRewards] = useState([]);
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const { theme, uiMode, setTheme, setUiMode } = useTheme();
   const { emoji, name, mascot } = useThemeMeta(theme);
 

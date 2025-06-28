@@ -5,7 +5,7 @@ import { XMarkIcon, Bars3Icon, Bars3BottomRightIcon } from "@heroicons/react/24/
 import LanguageSelector from "./LanguageSelector";
 import { supabase } from "../supabaseClient";
 import { useTheme } from "./ThemeContext";
-import useThemeMeta from "./useThemeMeta";
+//import useThemeMeta from "./useThemeMeta";
 
 export default function Navbar({ openGoalModal }) {
   const [user, setUser] = useState(null);
@@ -16,8 +16,8 @@ export default function Navbar({ openGoalModal }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userDisplayName, setUserDisplayName] = useState("User");
   const { t } = useTranslation();
-  const { uiMode, theme, setTheme, setUiMode } = useTheme();
-  const { emoji, mascot, name: themeName } = useThemeMeta(theme);
+  const { uiMode, theme, setTheme} = useTheme();
+  //const { emoji, mascot, name: themeName } = useThemeMeta(theme);
 
 
   const [darkModePreference, setDarkModePreference] = useState(() => {
@@ -136,7 +136,17 @@ export default function Navbar({ openGoalModal }) {
             className="text-[var(--color-navbar-text)] p-2 rounded-md hover:bg-[var(--color-navbar-hover-bg)] transition-colors flex items-center gap-2"
           >
             {uiMode === "kid" ? (
-              <span className="font-semibold text-lg">{userDisplayName}</span>
+              <span
+                className="px-3 py-1 rounded-full border font-semibold text-sm shadow-sm"
+                style={{
+                  borderColor: "var(--color-border)",
+                  backgroundColor: "var(--color-bg-card)",
+                  color: "var(--color-text-strong)",
+                }}
+              >
+                {userDisplayName}
+              </span>
+
             ) : (
               <Bars3BottomRightIcon className="h-6 w-6" />
             )}
