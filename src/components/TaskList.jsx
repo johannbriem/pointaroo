@@ -1,7 +1,7 @@
 import { useState } from "react";
 import TaskModal from "./TaskModal";
 import { useTranslation } from "react-i18next";
-import { kidThemeStyles } from "../data/themeStyles";
+import  kidThemeStyles from "../data/themeStyles";
 
 export default function TaskList({
   tasks = [],

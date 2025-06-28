@@ -7,6 +7,7 @@ import { startOfDay, endOfDay } from "date-fns";
 import { useTranslation } from "react-i18next";
 import LandingPage from "./LandingPage";
 import { useTheme } from "../components/ThemeContext";
+import useThemeMeta from "../components/useThemeMeta";
 
 const GOAL = 100;
 
@@ -23,6 +24,7 @@ export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { theme, uiMode, setTheme, setUiMode } = useTheme();
+  const { emoji, name, mascot } = useThemeMeta(theme);
 
   useEffect(() => {
     document.title = t("app.title");
@@ -161,6 +163,12 @@ export default function Home() {
       <div className="flex justify-center mb-4">
         <img src="/logo.png" alt={t("app.title")} className="h-12" />
       </div>
+
+      <h1 className="text-2xl font-bold mb-2">
+        {emoji} Welcome to {name} World!
+      </h1>
+      <p className="text-sm text-[var(--color-text-secondary)]">Say hi to {mascot} 👋</p>
+
 
       {/* Removed theme selector buttons from here */}
 

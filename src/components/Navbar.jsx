@@ -1,4 +1,3 @@
-// Updated and polished Navbar.jsx
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -297,9 +296,9 @@ export default function Navbar({ openGoalModal }) {
       )}
 
       {/* Overlay for both mobile menu and new menu card */}
-      {(menuOpen || showMenu) && (
+            {(menuOpen || showMenu) && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-5 z-40"
+          className="fixed inset-0 z-40 backdrop-blur-sm bg-opacity-10" // Changed classes
           onClick={() => { setMenuOpen(false); setShowMenu(false); }}
         ></div>
       )}

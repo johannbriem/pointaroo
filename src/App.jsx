@@ -8,6 +8,7 @@ import GoalModal from "./components/GoalModal";
 import './i18n';
 import "./styles/themes.css";
 
+
 const GOAL = 100;
 
 function App() {
