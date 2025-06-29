@@ -100,7 +100,17 @@
     "imageURL": "Image URL",
     "saveGoal": "Save Goal",
     "selectKid": "Select kid to preview",
-    "adminAccessOnly": "❌ Admin access only"
+    "adminAccessOnly": "❌ Admin access only",
+    "familyOverview": "Family Overview",
+    "familyTab": "Family",
+    "familyMembers": "Family Members",
+    "addFamilyMember": "Add Family Member",
+    "familyMemberName": "Family Member Name",
+    "familyMemberEmail": "Family Member Email",
+    "familyMemberRole": "Role",
+    "familyMemberRoleKid": "Kid",
+    "familyMemberRoleParent": "Parent",
+    "familyMemberRoleAdmin": "Admin"
   },
   "completions": {
     "title": "Task Completions",

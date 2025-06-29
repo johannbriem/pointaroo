@@ -4,6 +4,8 @@ import KidPreview from "../components/KidPreview";
 import KidsOverview from "../components/KidsOverview";
 import BonusPointsForm from "../components/BonusModal";
 import { useTranslation } from "react-i18next";
+import KidCard from "../components/KidCard";
+import EditKidModal from "../components/EditKidModal";
 
 export default function Admin() {
   const [user, setUser] = useState(null);
@@ -38,6 +40,8 @@ export default function Admin() {
   const [editingRewardId, setEditingRewardId] = useState(null);
   const [historyFilter, setHistoryFilter] = useState('all');
   const { t } = useTranslation();
+  const [ selectedKid, setSelectedKid ] = useState(null);
+ 
 
   useEffect(() => {
     const loadUserAndRole = async () => {
@@ -55,8 +59,6 @@ export default function Admin() {
     loadUserAndRole();
   }, []);
 
-  // This useEffect now handles fetching all admin-related data,
-  // and it only runs when we have a user and their role is confirmed to be 'admin'.
   useEffect(() => {
     if (user && role === 'admin') {
       fetchKids();
@@ -339,6 +341,7 @@ export default function Admin() {
           <button onClick={() => setActiveTab("bonus")}>🎁 {t("admin.bonusTab")}</button>
           <button onClick={() => setActiveTab("rewards")}>🎁 {t("admin.rewardsTab")}</button>
           <button onClick={() => setActiveTab("requests")}>✉️ {t("admin.requestsTab")} ({rewardRequests.filter(r => r.status === 'pending').length})</button>
+          <button onClick={() => setActiveTab("family")}>👨‍👩‍👧 {t("admin.familyTab")}</button>
         </div>
 
         {activeTab === "tasks" && (
@@ -433,7 +436,25 @@ export default function Admin() {
             </div>
           </>
         )}
-        {activeTab === "kids" && <KidsOverview kids={kids} />}
+        {activeTab === "family" && (
+          <div>
+            <h2 className="text-xl font-bold mb-4">📊 {t("admin.familyOverview")}</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {kids.map((kid) => (
+                <KidCard key={kid.id} kid={kid} onClick={setSelectedKid} />
+              ))}
+            </div>
+
+            {selectedKid && (
+              <EditKidModal
+                kid={selectedKid}
+                onClose={() => setSelectedKid(null)}
+                onSave={updateGoal}
+              />
+            )}
+          </div>
+        )}
+
         {activeTab === "bonus" && (
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-2">🎁 {t("admin.giveBonusPoints")}</h2>
@@ -636,99 +657,6 @@ export default function Admin() {
           </div>
         )}
 
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-2">👀 {t("admin.previewAsKid")}</h2>
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-2">🎯 {t("admin.editKidGoals")}</h2>
-            {kids.map((kid) => (
-              <div key={kid.id} className="bg-white border p-4 rounded shadow mb-4">
-                <h3 className="font-bold mb-2">{kid.display_name || kid.email}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder={t("admin.phoneModel")}
-                    className="border p-2 rounded"
-                    value={kid.goal?.phone_model || ""}
-                    onChange={(e) =>
-                      setKids((prev) =>
-                        prev.map((k) =>
-                          k.id === kid.id
-                            ? { ...k, goal: { ...k.goal, phone_model: e.target.value } }
-                            : k
-                        )
-                      )
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder={t("admin.totalCost")}
-                    className="border p-2 rounded"
-                    value={kid.goal?.total_cost || ""}
-                    onChange={(e) =>
-                      setKids((prev) =>
-                        prev.map((k) =>
-                          k.id === kid.id
-                            ? { ...k, goal: { ...k.goal, total_cost: e.target.value } }
-                            : k
-                        )
-                      )
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder={t("admin.parentPercent")}
-                    className="border p-2 rounded"
-                    value={kid.goal?.parent_percent || ""}
-                    onChange={(e) =>
-                      setKids((prev) =>
-                        prev.map((k) =>
-                          k.id === kid.id
-                            ? { ...k, goal: { ...k.goal, parent_percent: e.target.value } }
-                            : k
-                        )
-                      )
-                    }
-                  />
-                  <input
-                    type="text"
-                    placeholder={t("admin.imageUrl")}
-                    className="border p-2 rounded"
-                    value={kid.goal?.phone_image || ""}
-                    onChange={(e) =>
-                      setKids((prev) =>
-                        prev.map((k) =>
-                          k.id === kid.id
-                            ? { ...k, goal: { ...k.goal, phone_image: e.target.value } }
-                            : k
-                        )
-                      )
-                    }
-                  />
-                </div>
-                <button
-                  onClick={() => updateGoal(kid.id, kid.goal)}
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                  💾 {t("admin.saveGoal")}
-                </button>
-              </div>
-            ))}
-          </div>
-          <select
-            value={viewingKidId}
-            onChange={(e) => setViewingKidId(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md text-black"
-          >
-            <option value="">{t("admin.selectKidToPreview")}</option>
-            {kids.map((kid) => (
-              <option key={kid.id} value={kid.id}>
-                {kid.email}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {viewingKidId && <KidPreview userId={viewingKidId} />}
       </div>
 
         {showBonusModal && (
