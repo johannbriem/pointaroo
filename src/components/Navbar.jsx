@@ -41,7 +41,7 @@ export default function Navbar({ openGoalModal }) {
           const [goalNotifs, rewardRequests] = await Promise.all([
             supabase
               .from("goal_notifications")
-              .select("*")
+              .select("*, profiles(display_name)")
               .order("created_at", { ascending: false }),
             supabase
               .from("reward_requests")
@@ -57,7 +57,13 @@ export default function Navbar({ openGoalModal }) {
               combinedNotifications.push({
                 id: `goal-${n.id}`,
                 type: "goal_completed",
-                message: n.message,
+                message: `${
+                  n.profiles?.display_name || "Someone"
+                } completed their goal.`,
+                goal_id: n.goal_id,
+                profile_id: n.profile_id,
+                goal_name: n.goal_name,
+                goal_description: n.goal_description,
                 created_at: n.created_at,
               });
             });
@@ -82,7 +88,7 @@ export default function Navbar({ openGoalModal }) {
           setIsAdmin(false);
         } else {
           setIsAdmin(profile?.role === 'admin');
-          setUserDisplayName(profile?.display_name || user.email || "User");
+          setUserDisplayName(profile?.display_name || profile?.display_name || "User");
         }
       }
     };
@@ -104,7 +110,7 @@ export default function Navbar({ openGoalModal }) {
             setIsAdmin(false);
           } else {
             setIsAdmin(profile?.role === 'admin');
-            setUserDisplayName(profile?.display_name || session.user.email || "User");
+            setUserDisplayName(profile?.display_name || profile?.display_name || "User");
           }
         } else {
           setIsAdmin(false);
@@ -268,7 +274,7 @@ export default function Navbar({ openGoalModal }) {
         <div className="md:hidden flex items-center gap-4">
           <button
             onClick={() => {
-              setMenuOpen(true);
+              setMenuOpen(false);
               setShowMenu(true);
             }}
             className="text-[var(--color-navbar-text)] p-2 rounded-md hover:bg-[var(--color-navbar-hover-bg)] transition-colors"

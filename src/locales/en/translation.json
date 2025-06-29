@@ -148,7 +148,15 @@
     "robotTheme": "🤖 Robot",
     "oceanTheme": "🐠 Ocean",
     "closeMenu": "Close Menu",
-    "pirateTheme": "🏴‍☠️ Pirate"
+    "pirateTheme": "🏴‍☠️ Pirate",
+    "viewGoal": "View Goal",
+    "viewTasks": "View Tasks",
+    "viewStore": "View Store",
+    "viewCompletions": "View Completions",
+    "viewAdmin": "View Admin",
+    "dismiss": "Dismiss",
+    "notifications": "Notifications",
+    "noNotifications": "No notifications"
   },
   "taskModal": {
     "beforePhoto": "📸 Before Photo",
