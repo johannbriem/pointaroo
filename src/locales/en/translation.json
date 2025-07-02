@@ -49,10 +49,12 @@
     "goalNotFound": "Goal not found.",
     "goalCompleted": "Goal completed!",
     "goalCompletedMessage": "Congratulations! You have completed your goal.",
-    "setNewGoal": "Set a new goal",
+    "setNewGoal": "Click here",
     "setGoalPrompt": "Set a goal to start earning points.",
     "goalPending": "Goal pending",
-    "waitingApproval": "Waiting for approval"
+    "waitingApproval": "Waiting for approval",
+    "wantNewGoal": "Want to set a new goal?",
+    "motivation": "Motivation"
   },
   "tasks": {
     "title": "Tasks",

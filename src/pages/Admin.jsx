@@ -439,7 +439,7 @@ export default function Admin() {
         {activeTab === "family" && (
           <div>
             <h2 className="text-xl font-bold mb-4">📊 {t("admin.familyOverview")}</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 text-black sm:grid-cols-3 md:grid-cols-4 gap-4">
               {kids.map((kid) => (
                 <KidCard key={kid.id} kid={kid} onClick={setSelectedKid} />
               ))}

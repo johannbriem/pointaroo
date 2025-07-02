@@ -53,9 +53,9 @@ export default function AdminFamilyPage() {
       <div className="bg-white p-4 rounded shadow-sm">
         {activeTab === "members" && (
           <div>
-            <h2 className="font-bold mb-2">{t("admin.familyMembers")}</h2>
+            <h2 className="font-bold mb-2 text-blue-200">{t("admin.familyMembers")}</h2>
             {familyMembers.map((m) => (
-              <div key={m.id} className="p-2 border-b">
+              <div key={m.id} className="p-2 border-b text-black">
                 {m.display_name} ({m.role}) - {m.email}
               </div>
             ))}

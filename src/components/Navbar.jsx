@@ -198,54 +198,57 @@ export default function Navbar({ openGoalModal }) {
             >
               <span className="text-2xl">🔔</span>
               {notifications.length > 0 && (
-                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                  {notifications.length > 9 ? "9+" : notifications.length}
+                </span>
               )}
             </button>
           )}
           {showNotifications && isAdmin && (
-            <div ref={notificationRef} className="absolute right-4 mt-2 w-80 ...">
-              <div className="absolute right-4 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 text-sm">
-                <h3 className="font-bold mb-2 text-gray-800">🔔 {t("navbar.notifications")}</h3>
-                {notifications.length === 0 ? (
-                  <p className="text-gray-500">{t("navbar.noNotifications")}</p>
-                ) : (
-                  <ul className="space-y-3">
-                    {notifications.map((n) => (
-                      <li key={n.id} className="border-b pb-2">
-                        <p className="text-gray-800">{n.message}</p>
-                        <div className="flex justify-end gap-2 mt-1">
-                          {n.type === "reward_request" ? (
-                            <Link
-                              to="/admin?tab=requests"
-                              className="text-sm text-blue-600 font-semibold hover:underline"
-                              onClick={() => setShowNotifications(false)}
-                            >
-                              {t("navbar.review")}
-                            </Link>
-                          ) : n.type === "goal_completed" ? (
-                            <Link
-                              to="/admin?tab=goals"
-                              className="text-sm text-green-600 font-semibold hover:underline"
-                              onClick={() => setShowNotifications(false)}
-                            >
-                              {t("navbar.viewGoal")}
-                            </Link>
-                          ) : null}
-                          <button
-                            onClick={async () => {
-                              await supabase.from("notifications").update({ read: true }).eq("id", n.id);
-                              setNotifications(notifications.filter(notif => notif.id !== n.id));
-                            }}
-                            className="text-xs text-gray-500 hover:text-gray-800"
+            <div
+              ref={notificationRef}
+              className="fixed top-16 right-4 w-[90vw] md:w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 text-sm"
+            >
+              <h3 className="font-bold mb-2 text-gray-800">🔔 {t("navbar.notifications")}</h3>
+              {notifications.length === 0 ? (
+                <p className="text-gray-500">{t("navbar.noNotifications")}</p>
+              ) : (
+                <ul className="space-y-3">
+                  {notifications.map((n) => (
+                    <li key={n.id} className="border-b pb-2">
+                      <p className="text-gray-800">{n.message}</p>
+                      <div className="flex justify-end gap-2 mt-1">
+                        {n.type === "reward_request" ? (
+                          <Link
+                            to="/admin?tab=requests"
+                            className="text-sm text-blue-600 font-semibold hover:underline"
+                            onClick={() => setShowNotifications(false)}
                           >
-                            {t("navbar.dismiss")}
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+                            {t("navbar.review")}
+                          </Link>
+                        ) : n.type === "goal_completed" ? (
+                          <Link
+                            to="/admin?tab=goals"
+                            className="text-sm text-green-600 font-semibold hover:underline"
+                            onClick={() => setShowNotifications(false)}
+                          >
+                            {t("navbar.viewGoal")}
+                          </Link>
+                        ) : null}
+                        <button
+                          onClick={async () => {
+                            await supabase.from("notifications").update({ read: true }).eq("id", n.id);
+                            setNotifications(notifications.filter((notif) => notif.id !== n.id));
+                          }}
+                          className="text-xs text-gray-500 hover:text-gray-800"
+                        >
+                          {t("navbar.dismiss")}
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
           <button
@@ -272,6 +275,19 @@ export default function Navbar({ openGoalModal }) {
 
         {/* Mobile Toggle - Unified with new menu card */}
         <div className="md:hidden flex items-center gap-4">
+          {isAdmin && (
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative z-50 p-2 rounded hover:bg-[var(--color-navbar-hover-bg)]"
+            >
+              <span className="text-2xl">🔔</span>
+              {notifications.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                  {notifications.length > 9 ? "9+" : notifications.length}
+                </span>
+              )}
+            </button>
+          )}
           <button
             onClick={() => {
               setMenuOpen(false);
@@ -407,7 +423,6 @@ export default function Navbar({ openGoalModal }) {
           </div>
         </div>
       )}
-
 
       {/* Overlay for both mobile menu and new menu card */}
             {(menuOpen || showMenu) && (
