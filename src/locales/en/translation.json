@@ -40,7 +40,19 @@
     "goal": "Goal",
     "totalCost": "Total cost",
     "parentPays": "Parent pays",
-    "yourGoal": "Your goal"
+    "yourGoal": "Your goal",
+    "goalDescription": "Goal description",
+    "goalImage": "Goal image (optional)",
+    "setGoal": "Set Goal",
+    "editGoal": "Edit Goal",
+    "noGoal": "No goal set yet.",
+    "goalNotFound": "Goal not found.",
+    "goalCompleted": "Goal completed!",
+    "goalCompletedMessage": "Congratulations! You have completed your goal.",
+    "setNewGoal": "Set a new goal",
+    "setGoalPrompt": "Set a goal to start earning points.",
+    "goalPending": "Goal pending",
+    "waitingApproval": "Waiting for approval"
   },
   "tasks": {
     "title": "Tasks",

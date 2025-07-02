@@ -54,7 +54,7 @@ export default function Layout() {
 
       <main className="flex-grow overflow-y-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto py-6">
-          <Outlet context={{ user, loading }} />
+          <Outlet context={{ user, loading, openGoalModal: () => setShowGoalModal(true) }} />
         </div>
       </main>
     </div>

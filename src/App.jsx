@@ -56,7 +56,7 @@ function App() {
     return reward ? sum + reward.cost : sum;
   }, 0);
 
-  const availablePoints = earnedPoints - spentPoints;
+  // const availablePoints = earnedPoints - spentPoints;
 
 
   useEffect(() => {
